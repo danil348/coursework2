@@ -2,7 +2,9 @@
 
 Game::Game()
 {
+#ifdef SOCKET
 	this->socketRun();
+#endif // SOCKET
 
 	this->window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "coursework");
 	//window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "coursework", sf::Style::Fullscreen);
@@ -28,7 +30,9 @@ void Game::gameRun()
 	while (this->window->isOpen())
 	{
 		this->update();
+#ifdef SOCKET
 		this->sendData();
+#endif // SOCKET
 		this->render();
 	}
 }
@@ -50,7 +54,8 @@ void Game::update()
 void Game::render()
 {
 	this->window->clear();
-	
+
+	this->screen.render(this->window);
 	//render smf
 	// 
 	//render smf

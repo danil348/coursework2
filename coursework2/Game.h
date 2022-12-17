@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Tcp_Socket.h"
+#include "GameScreen.h"
+
 using namespace std;
 
 class Game
@@ -21,5 +23,7 @@ private:
 	sf::RenderWindow* window;
 	sf::Event event;
 	Tcp_Socket* tcp_socket;
+
+	GameScreen screen;
 };
 
