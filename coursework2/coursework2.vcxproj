@@ -128,9 +128,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="characters.cpp" />
     <ClCompile Include="coursework2.cpp" />
+    <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameScreen.cpp" />
+    <ClCompile Include="PumpingScreen.cpp" />
     <ClCompile Include="Tcp_Socket.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
@@ -138,8 +141,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="characters.h" />
+    <ClInclude Include="FontManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameScreen.h" />
+    <ClInclude Include="PumpingScreen.h" />
     <ClInclude Include="Tcp_Socket.h" />
     <ClInclude Include="TextureManager.h" />
   </ItemGroup>

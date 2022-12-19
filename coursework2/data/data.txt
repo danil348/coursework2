@@ -1,0 +1,3 @@
+fi img/c1.png 500 20 30
+sec img/c2.png 500 20 30
+tree img/c3.png 500 20 30

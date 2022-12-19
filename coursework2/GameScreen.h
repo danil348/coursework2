@@ -13,10 +13,5 @@ public:
 	void render(sf::RenderWindow* window);
 private:
 	sf::Sprite* background;
-
-
-	sf::Texture* back_texture;
-	sf::Sprite* back_sprite;
-
 };
 

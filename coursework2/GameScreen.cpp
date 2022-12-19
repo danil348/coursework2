@@ -2,7 +2,7 @@
 
 GameScreen::GameScreen()
 {
-	this->background = TextureManager::load("1.png", 1920, 1080);
+	this->background = TextureManager::load("img/arena.jpg", 1920, 1080);
 }
 
 void GameScreen::render(sf::RenderWindow* window)

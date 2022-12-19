@@ -2,6 +2,7 @@
 
 Game::Game()
 {
+	this->loadFromFile();
 #ifdef SOCKET
 	this->socketRun();
 #endif // SOCKET
@@ -46,6 +47,7 @@ void Game::update()
 		}
 	}
 
+	this->pumpingScreen.update(this->event, this->heroes);
 	//update game
 	// 
 	//update game
@@ -55,7 +57,9 @@ void Game::render()
 {
 	this->window->clear();
 
-	this->screen.render(this->window);
+	//this->screen.render(this->window);
+	this->pumpingScreen.render(heroes, window);
+
 	//render smf
 	// 
 	//render smf
@@ -97,4 +101,49 @@ void Game::socketRun()
 	}
 
 	this->tcp_socket->start();
+}
+
+void Game::loadFromFile()
+{
+	characters* tmpCharacters;
+	ifstream file("data/data.txt");
+	string tmpS;
+	int tmpI;
+
+	if (file.is_open() == true) {
+		while (!file.eof())
+		{
+			tmpCharacters = new characters;
+			file >> tmpS;
+			tmpCharacters->setName(tmpS);
+			file >> tmpS;
+			tmpCharacters->setPicturePath(tmpS);
+			tmpCharacters->setSprite();
+			file >> tmpI;
+			tmpCharacters->set_w_h(tmpI, tmpI);
+			file >> tmpI;
+			tmpCharacters->set_x(tmpI);
+			file >> tmpI;
+			tmpCharacters->set_y(tmpI);
+
+			this->heroes.push_back(*tmpCharacters);
+		}
+	}
+}
+
+void Game::saveToFile()
+{
+	ofstream file("data/data.txt");
+	if (file.is_open() == true) {
+		for (int i = 0; i < this->heroes.size(); i++) {
+			file << heroes[i].getName() << " ";
+			file << heroes[i].getPicturePath() << " ";
+			file << heroes[i].get_h() << " ";
+			file << heroes[i].get_x() << " ";
+			file << heroes[i].get_y();
+			if (i < this->heroes.size() - 1) {
+				cout << endl;
+			}
+		}
+	}
 }

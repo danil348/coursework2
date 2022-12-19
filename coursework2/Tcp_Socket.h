@@ -3,7 +3,7 @@
 #include <iostream>
 
 #define DEBUG
-#define SOCKET
+//#define SOCKET
 
 using namespace std;
 
