@@ -26,6 +26,7 @@ public:
 	void loadFromFile();
 	void saveToFile();
 private:
+	int gameScore;
 	sf::RenderWindow* window;
 	sf::Event event;
 	Tcp_Socket* tcp_socket;

@@ -15,6 +15,7 @@ public:
 	void set_x(int x) { this->x = x; };
 	void set_y(int y) { this->y = y; };
 	void setSprite();
+	void setSelected(bool selected) { this->selected = selected; };
 public:
 	int get_w() { return this->width; };
 	int get_h() { return this->height; };
@@ -26,6 +27,9 @@ public:
 	int getAttack() { return this->attack; };
 	int getArmor() { return this->armor; };
 	int getHealth() { return this->health; };
+	bool getSelected() { return this->selected; };
+	int getCriticalDamage() { return this->criticalDamage; };
+	int getCriticalDamage—hance() { return this->criticalDamage—hance; };
 private:
 	string name;
 	string picturePath;
@@ -36,5 +40,9 @@ private:
 	int attack = 10;
 	int armor = 100;
 	int health = 100;
+	int criticalDamage = 33;
+	int criticalDamage—hance = 13;
+
+	bool selected = false;
 };
 

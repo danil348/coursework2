@@ -2,6 +2,7 @@
 
 Game::Game()
 {
+	this->gameScore = 0;
 	this->loadFromFile();
 #ifdef SOCKET
 	this->socketRun();
@@ -9,7 +10,7 @@ Game::Game()
 
 	this->window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "coursework");
 	//window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "coursework", sf::Style::Fullscreen);
-	this->window->setFramerateLimit(60);
+	this->window->setFramerateLimit(144);
 	this->window->setVerticalSyncEnabled(false);
 
 	//init items
@@ -58,7 +59,7 @@ void Game::render()
 	this->window->clear();
 
 	//this->screen.render(this->window);
-	this->pumpingScreen.render(heroes, window);
+	this->pumpingScreen.render(this->heroes, this->window, this->gameScore);
 
 	//render smf
 	// 
