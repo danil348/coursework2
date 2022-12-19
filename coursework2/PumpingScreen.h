@@ -15,5 +15,9 @@ public:
 	void update(sf::Event event, vector<characters> heroes);
 private:
 	int currentHero;
+	FontManager fontManager;
+
 	sf::Sprite* background;
+	sf::Clock* clock;
+	sf::Time time;
 };
