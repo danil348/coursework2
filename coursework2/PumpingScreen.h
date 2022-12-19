@@ -3,6 +3,7 @@
 #include "TextureManager.h"
 #include "FontManager.h"
 #include "characters.h"
+#include <string>
 #include <iostream>
 
 using namespace std;

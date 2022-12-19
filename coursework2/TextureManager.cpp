@@ -3,6 +3,7 @@
 sf::Sprite* TextureManager::load(string pngPath, int width, int height)
 {
     sf::Texture* tmpTexture = new sf::Texture;
+    tmpTexture->setSmooth(true);
     sf::Sprite* tmpSprite = new sf::Sprite;
  
     tmpTexture->loadFromFile(pngPath);

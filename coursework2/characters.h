@@ -23,11 +23,18 @@ public:
 	string getName() { return this->name; };
 	string getPicturePath() { return this->picturePath; };
 	sf::Sprite* getSprite() { return this->picture; };
+	int getAttack() { return this->attack; };
+	int getArmor() { return this->armor; };
+	int getHealth() { return this->health; };
 private:
 	string name;
 	string picturePath;
 	sf::Sprite* picture;
 	int width, height;
 	int x, y;
+
+	int attack = 10;
+	int armor = 100;
+	int health = 100;
 };
 

@@ -10,8 +10,15 @@ PumpingScreen::PumpingScreen()
 void PumpingScreen::render(vector<characters> heroes, sf::RenderWindow* window)
 {
 	window->draw(*this->background);
-	window->draw(*heroes[currentHero].getSprite());
-	window->draw(*fontManager.getText(heroes[currentHero].getName(), 30, sf::Color::Black, 800, 500));
+	window->draw(*heroes[currentHero].getSprite()); 
+	window->draw(*fontManager.getText(heroes[currentHero].getName(), 50, sf::Color::Black, 1200, 100));
+
+	window->draw(*fontManager.getText("Attack: ", 30, sf::Color::Black, 1000, 200));
+	window->draw(*fontManager.getText(to_string(heroes[currentHero].getAttack()), 30, sf::Color::Black, 1000 + 350, 200));
+
+	window->draw(*fontManager.getText("Armor: ", 30, sf::Color::Black, 1000, 250));
+	window->draw(*fontManager.getText(to_string(heroes[currentHero].getArmor()), 30, sf::Color::Black, 1000 + 350, 250));
+
 }
 
 void PumpingScreen::update(sf::Event event, vector<characters> heroes)
