@@ -14,7 +14,11 @@ public:
 	PumpingScreen();
 	void render(vector<characters> heroes, sf::RenderWindow* window, int gameScore);
 	void update(sf::Event event, vector<characters> &heroes, int& gameScore);
+	bool isRunning() { return this->_rinning; };
+	void setRunning(bool value) { this->_rinning = value; };
 private:
+	bool waitingTime(sf::Event event);
+
 	int currentSetting;
 	bool setting;
 	const int settingCount = 4;
@@ -31,4 +35,6 @@ private:
 	float colorValue;
 	bool increase;
 	float offset;
+
+	bool _rinning;
 };

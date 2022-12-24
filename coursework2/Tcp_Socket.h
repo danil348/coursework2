@@ -4,7 +4,7 @@
 #include "characters.h"
 
 #define DEBUG
-#define SOCKET
+//#define SOCKET
 
 using namespace std;
 

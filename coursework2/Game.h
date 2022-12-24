@@ -1,9 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Tcp_Socket.h"
-#include "GameScreen.h"
 #include "characters.h"
 #include "PumpingScreen.h"
+#include "Menu.h"
 #include <fstream>
 #include <vector>
 
@@ -33,8 +33,11 @@ private:
 
 	vector<characters> heroes;
 	vector<characters> enemyHeroes;
+
+	bool pumpingScreenIsOpen;
 	PumpingScreen pumpingScreen;
-	
-	GameScreen screen;
+
+	bool menuIsOpen;
+	Menu menu;
 };
 

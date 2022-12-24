@@ -4,6 +4,10 @@ Game::Game()
 {
 	this->gameScore = 10;
 	this->loadFromFile();
+
+	this->menuIsOpen = true;
+	this->menu.setRunning(true);
+	this->pumpingScreenIsOpen = false;
 #ifdef SOCKET
 	this->socketRun();
 #endif // SOCKET
@@ -16,6 +20,7 @@ Game::Game()
 	//init items
 	// 
 	//init items
+	this->menu.setRunning(true);
 }
 
 Game::~Game()
@@ -49,22 +54,33 @@ void Game::update()
 		}
 	}
 
-	this->pumpingScreen.update(this->event, this->heroes, this->gameScore);
-	//update game
-	// 
-	//update game
+	if (this->menu.isRunning() == true) {
+		this->pumpingScreenIsOpen = false;
+		this->menu.update(this->event);
+		if (this->menu.getCurrentItem() == 0 && this->menu.isRunning() == false) {
+			this->pumpingScreen.setRunning(true);
+		}
+	}
+
+	if (this->pumpingScreen.isRunning() == true) {
+		this->menu.setRunning(false);
+		this->pumpingScreen.update(this->event, this->heroes, this->gameScore);
+		if (this->pumpingScreen.isRunning() == false) {
+			this->menu.setRunning(true);
+		}
+	}
 }
 
 void Game::render()
 {
 	this->window->clear();
 
-	//this->screen.render(this->window);
-	this->pumpingScreen.render(this->heroes, this->window, this->gameScore);
-
-	//render smf
-	// 
-	//render smf
+	if (this->menu.isRunning() == true) {
+		this->menu.render(this->window);
+	}
+	if (this->pumpingScreen.isRunning() == true) {
+		this->pumpingScreen.render(this->heroes, this->window, this->gameScore);
+	}
 
 	this->window->display();
 }
@@ -155,9 +171,10 @@ void Game::saveToFile()
 			file << heroes[i].attack << " ";
 			file << heroes[i].health << " ";
 			file << heroes[i].criticalDamage << " ";
-			file << heroes[i].criticalDamageÑhance << " ";
+			file << heroes[i].criticalDamageÑhance;
 
 			if (i < this->heroes.size() - 1) {
+				file << " ";
 				file << endl;
 			}
 		}

@@ -11,6 +11,7 @@ PumpingScreen::PumpingScreen()
 	this->offset = 150;
 	this->currentSetting = 0;
 	this->setting = false;
+	this->_rinning = false;
 }
 
 void PumpingScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
@@ -50,16 +51,21 @@ void PumpingScreen::render(vector<characters> heroes, sf::RenderWindow* window, 
 	window->draw(*this->fontManager.getText(L"Очки: ", 30, sf::Color::Black, 20, 20));
 	window->draw(*this->fontManager.getText(to_string(gameScore), 30, sf::Color::Black, 100, 20));
 
-	window->draw(*this->fontManager.getText(L"Нажмите Enter, чтобы начать улучшать героя", 30, sf::Color(this->colorValue, this->colorValue, this->colorValue), 580, 1000));
-
-	window->draw(*this->arrow);
+	if (heroes[this->currentHero].getSelected() == false) {
+		window->draw(*this->fontManager.getText(L"Нажмите Enter, чтобы начать улучшать героя", 30, sf::Color(this->colorValue, this->colorValue, this->colorValue), 580, 1000));
+	}
+	else {
+		window->draw(*this->fontManager.getText(L"Нажмите RCntrl, чтобы увеличить выбранную характеристику", 30, sf::Color(this->colorValue, this->colorValue, this->colorValue), 510, 1000));
+	}
+	
+	//window->draw(*this->arrow);
 }
 
 void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gameScore)
 {
-	this->time = this->clock->getElapsedTime();
-	if (this->time.asMilliseconds() >= 200) {
+	if (this->waitingTime(event) == true) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+			this->clock->restart();
 			heroes[this->currentHero].setSelected(false);
 			this->currentHero--;
 
@@ -71,6 +77,7 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gam
 			}
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+			this->clock->restart();
 			heroes[this->currentHero].setSelected(false);
 			this->currentHero++;
 
@@ -82,20 +89,25 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gam
 			}
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+			this->clock->restart();
 			heroes[this->currentHero].setSelected(true);
 		}
-		this->clock->restart();
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+			this->_rinning = false;
+		}
 
 		for (int i = 0; i < heroes.size(); i++) {
 			if (heroes[i].getSelected() == true) {
 				this->setting = true;
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+					this->clock->restart();
 					this->currentSetting++;
 					if (this->currentSetting > this->settingCount) {
 						this->currentSetting = 0;
 					}
 				}
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+					this->clock->restart();
 					this->currentSetting--;
 					if (this->currentSetting < 0) {
 						this->currentSetting = this->settingCount;
@@ -106,6 +118,7 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gam
 
 		if (heroes[this->currentHero].getSelected() == true && this->setting == true && gameScore > 0 && 
 			sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) {
+			this->clock->restart();
 			if (this->currentSetting == 0 && heroes[this->currentHero].attack < 100) {
 				gameScore--;
 				heroes[this->currentHero].attack++;
@@ -129,11 +142,6 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gam
 		}
 	}
 
-	if (event.type == sf::Event::KeyReleased) {
-		this->time = sf::seconds(2);
-	}
-
-
 	if (this->colorValue < 30) {
 		this->increase = true;
 	}
@@ -147,4 +155,13 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gam
 	else {
 		this->colorValue += 0.5;
 	}
+}
+
+bool PumpingScreen::waitingTime(sf::Event event) 
+{
+	if (event.type == sf::Event::KeyReleased) {
+		this->time = sf::seconds(2);
+	}
+	this->time = this->clock->getElapsedTime();
+	return (this->time.asMilliseconds() >= 200);
 }
