@@ -118,7 +118,9 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 					}
 
 					if (this->soc_ip.size() >= 13 && this->_soc_port.size() >= 5 && sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
-						this->soc_tcp = new Tcp_Socket(this->soc_ip, atoi(this->_soc_port.c_str()));
+						this->soc_tcp = new Tcp_Socket(this->soc_ip.substr(4,this->soc_ip.size()), unsigned short(atoi(this->_soc_port.c_str())));
+						cout << this->soc_ip.substr(4, this->soc_ip.size()) << endl;
+						cout << this->soc_ip << endl;
 						this->soc_connect_step = this->connection;
 					}
 				}
