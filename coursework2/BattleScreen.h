@@ -25,4 +25,6 @@ private:
 	unsigned short soc_port;
 	string _soc_port;
 	Tcp_Socket* soc_tcp;
+
+	bool _render;
 };

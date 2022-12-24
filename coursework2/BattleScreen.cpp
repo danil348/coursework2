@@ -12,6 +12,7 @@ BattleScreen::BattleScreen()
 	this->soc_type = this->undefined;
 	this->soc_connect_step = this->type_selection;
 	this->soc_tcp = NULL;
+	this->_render = false;
 }
 
 void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
@@ -28,7 +29,8 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 			, 30, 500));
 	}
 
-	if (this->soc_connect_step == this->data_entry && this->soc_type == this->server) {
+	if ((this->soc_connect_step == this->connection || this->soc_connect_step == this->game) && this->soc_type == this->server) {
+		cout << this->soc_ip;
 		window->draw(*this->fontManager.getText(this->soc_ip, 30, sf::Color::Black, 100, 800));
 		window->draw(*this->fontManager.getText(this->_soc_port, 30, sf::Color::Black, 100, 900));
 	}
@@ -42,10 +44,20 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 			this->currentItem == 1 ? sf::Color::Red : sf::Color::Black
 			, 30, 500));
 	}
+
 }
 
 void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& gameScore)
 {
+	if (this->soc_connect_step == this->connection && this->_render == true && this->soc_tcp != NULL) {
+		this->soc_tcp->start();
+		this->soc_connect_step = this->game;
+	}
+	if (this->soc_connect_step == this->game) {
+		this->soc_tcp->send(heroes, heroes);
+		this->soc_tcp->receive(heroes, heroes);
+	}
+
 	if (this->waitingTime(event) == true) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
 			this->clock->restart();
@@ -88,6 +100,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 					this->soc_tcp = new Tcp_Socket;
 					this->soc_ip = "Ip: " + this->soc_tcp->getIp();
 					this->_soc_port = "Port: " + to_string(this->soc_tcp->getPort());
+					this->soc_connect_step = this->connection;
 				}
 			}
 			if (this->soc_type == this->client) {
@@ -110,15 +123,11 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 					}
 				}
 			}
-			if (this->soc_connect_step == this->connection) {
-				this->soc_tcp->start();
-				this->soc_connect_step = this->game;
-			}
+			
 		}
 	}
 
-	this->soc_tcp->send(heroes, heroes);
-	this->soc_tcp->receive(heroes, heroes)
+	this->_render = true;
 }
 
 void BattleScreen::keyPressed(string& value) 
