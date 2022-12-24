@@ -3,6 +3,8 @@
 #include "Tcp_Socket.h"
 #include "characters.h"
 #include "PumpingScreen.h"
+#include "BattleScreen.h"
+#include "GameScreen.h"
 #include "Menu.h"
 #include <fstream>
 #include <vector>
@@ -39,5 +41,8 @@ private:
 
 	bool menuIsOpen;
 	Menu menu;
+
+	bool battleScreenIsOpen;
+	BattleScreen battleScreen;
 };
 

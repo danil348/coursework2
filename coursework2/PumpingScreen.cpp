@@ -156,12 +156,3 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gam
 		this->colorValue += 0.5;
 	}
 }
-
-bool PumpingScreen::waitingTime(sf::Event event) 
-{
-	if (event.type == sf::Event::KeyReleased) {
-		this->time = sf::seconds(2);
-	}
-	this->time = this->clock->getElapsedTime();
-	return (this->time.asMilliseconds() >= 200);
-}

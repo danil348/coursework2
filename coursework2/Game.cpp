@@ -7,7 +7,6 @@ Game::Game()
 
 	this->menuIsOpen = true;
 	this->menu.setRunning(true);
-	this->pumpingScreenIsOpen = false;
 #ifdef SOCKET
 	this->socketRun();
 #endif // SOCKET
@@ -55,17 +54,34 @@ void Game::update()
 	}
 
 	if (this->menu.isRunning() == true) {
-		this->pumpingScreenIsOpen = false;
+		this->pumpingScreen.setRunning(false);
+		this->battleScreen.setRunning(false);
+		
 		this->menu.update(this->event);
 		if (this->menu.getCurrentItem() == 0 && this->menu.isRunning() == false) {
 			this->pumpingScreen.setRunning(true);
+		}
+		if (this->menu.getCurrentItem() == 1 && this->menu.isRunning() == false) {
+			this->battleScreen.setRunning(true);
 		}
 	}
 
 	if (this->pumpingScreen.isRunning() == true) {
 		this->menu.setRunning(false);
+		this->battleScreen.setRunning(false);
+
 		this->pumpingScreen.update(this->event, this->heroes, this->gameScore);
 		if (this->pumpingScreen.isRunning() == false) {
+			this->menu.setRunning(true);
+		}
+	}
+
+	if (this->battleScreen.isRunning() == true) {
+		this->menu.setRunning(false);
+		this->pumpingScreen.setRunning(false);
+
+		this->battleScreen.update(this->event, this->heroes, this->gameScore);
+		if (this->battleScreen.isRunning() == false) {
 			this->menu.setRunning(true);
 		}
 	}
@@ -80,6 +96,9 @@ void Game::render()
 	}
 	if (this->pumpingScreen.isRunning() == true) {
 		this->pumpingScreen.render(this->heroes, this->window, this->gameScore);
+	}
+	if (this->battleScreen.isRunning() == true) {
+		this->battleScreen.render(this->heroes, this->window, this->gameScore);
 	}
 
 	this->window->display();
