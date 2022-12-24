@@ -32,6 +32,16 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 		window->draw(*this->fontManager.getText(this->soc_ip, 30, sf::Color::Black, 100, 800));
 		window->draw(*this->fontManager.getText(this->_soc_port, 30, sf::Color::Black, 100, 900));
 	}
+
+	if (this->soc_connect_step == this->data_entry && this->soc_type == this->client) {
+		window->draw(*this->fontManager.getText(this->soc_ip, 50,
+			this->currentItem == 0 ? sf::Color::Red : sf::Color::Black
+			, 30, 400));
+
+		window->draw(*this->fontManager.getText(this->_soc_port, 50,
+			this->currentItem == 1 ? sf::Color::Red : sf::Color::Black
+			, 30, 500));
+	}
 }
 
 void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& gameScore)
@@ -82,7 +92,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 			}
 			if (this->soc_type == this->client) {
 				if (this->soc_tcp == NULL) {
-					if (this->soc_ip.size() < 13) {
+					if (this->soc_ip.size() < 17) {
 						if (sf::Keyboard::isKeyPressed(sf::Keyboard::Comma)) {
 							this->clock->restart();
 							this->soc_ip += ".";
@@ -91,6 +101,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 					}
 					else if (this->_soc_port.size() < 5) {
 						this->keyPressed(this->_soc_port);
+						cout << atoi(this->_soc_port.c_str()) << endl;
 					}
 
 					if (this->soc_ip.size() >= 13 && this->_soc_port.size() >= 5 && sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
