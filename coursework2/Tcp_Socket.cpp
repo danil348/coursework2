@@ -61,6 +61,12 @@ void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroe
 {
 	this->packet.clear();
 
+	if (this->TcpType == this->client) {
+		this->packet << "client send mes";
+	}
+	else {
+		this->packet << "server send mes";
+	}
 	//this->packet << data;
 	// 
 	//this->packet << data;
@@ -70,7 +76,10 @@ void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroe
 
 void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes)
 {
+	string data;
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
+		this->packet >> data;
+		cout << data;
 
 		//this->packet >> data;
 		// 

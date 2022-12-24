@@ -112,9 +112,13 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 			}
 			if (this->soc_connect_step == this->connection) {
 				this->soc_tcp->start();
+				this->soc_connect_step = this->game;
 			}
 		}
 	}
+
+	this->soc_tcp->send(heroes, heroes);
+	this->soc_tcp->receive(heroes, heroes)
 }
 
 void BattleScreen::keyPressed(string& value) 
