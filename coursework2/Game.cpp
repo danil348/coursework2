@@ -2,7 +2,7 @@
 
 Game::Game()
 {
-	this->gameScore = 0;
+	this->gameScore = 10;
 	this->loadFromFile();
 #ifdef SOCKET
 	this->socketRun();
@@ -20,6 +20,7 @@ Game::Game()
 
 Game::~Game()
 {
+	this->saveToFile();
 	delete this->window;
 
 	//delete items
@@ -48,7 +49,7 @@ void Game::update()
 		}
 	}
 
-	this->pumpingScreen.update(this->event, this->heroes);
+	this->pumpingScreen.update(this->event, this->heroes, this->gameScore);
 	//update game
 	// 
 	//update game
@@ -70,8 +71,8 @@ void Game::render()
 
 void Game::sendData()
 {
-	this->tcp_socket->send();
-	this->tcp_socket->receive();
+	this->tcp_socket->send(this->enemyHeroes, this->heroes);
+	this->tcp_socket->receive(this->enemyHeroes, this->heroes);
 }
 
 void Game::socketRun()
@@ -127,9 +128,16 @@ void Game::loadFromFile()
 			file >> tmpI;
 			tmpCharacters->set_y(tmpI);
 
+			file >> tmpCharacters->armor;
+			file >> tmpCharacters->attack;
+			file >> tmpCharacters->health;
+			file >> tmpCharacters->criticalDamage;
+			file >> tmpCharacters->criticalDamageÑhance;
+
 			this->heroes.push_back(*tmpCharacters);
 		}
 	}
+	file.close();
 }
 
 void Game::saveToFile()
@@ -137,14 +145,22 @@ void Game::saveToFile()
 	ofstream file("data/data.txt");
 	if (file.is_open() == true) {
 		for (int i = 0; i < this->heroes.size(); i++) {
-			file << heroes[i].getName() << " ";
-			file << heroes[i].getPicturePath() << " ";
+			cout << i;
+			file << heroes[i].name << " ";
+			file << heroes[i].picturePath << " ";
 			file << heroes[i].get_h() << " ";
 			file << heroes[i].get_x() << " ";
-			file << heroes[i].get_y();
+			file << heroes[i].get_y() << " ";
+			file << heroes[i].armor << " ";
+			file << heroes[i].attack << " ";
+			file << heroes[i].health << " ";
+			file << heroes[i].criticalDamage << " ";
+			file << heroes[i].criticalDamageÑhance << " ";
+
 			if (i < this->heroes.size() - 1) {
-				cout << endl;
+				file << endl;
 			}
 		}
 	}
+	file.close();
 }

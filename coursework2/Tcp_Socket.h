@@ -1,9 +1,10 @@
 #pragma once
 #include <SFML/Network.hpp>
 #include <iostream>
+#include "characters.h"
 
 #define DEBUG
-//#define SOCKET
+#define SOCKET
 
 using namespace std;
 
@@ -16,8 +17,8 @@ public:
 	void start();
 	bool accept();
 	bool connect();
-	void send();
-	void receive();
+	void send(vector<characters>& enemyHeroes, vector<characters>& heroes);
+	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes);
 public:
 	unsigned short getPort();
 	string getIp();

@@ -32,6 +32,7 @@ private:
 	Tcp_Socket* tcp_socket;
 
 	vector<characters> heroes;
+	vector<characters> enemyHeroes;
 	PumpingScreen pumpingScreen;
 	
 	GameScreen screen;

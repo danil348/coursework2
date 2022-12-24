@@ -21,27 +21,21 @@ public:
 	int get_h() { return this->height; };
 	int get_x() { return this->x; };
 	int get_y() { return this->y; };	
-	string getName() { return this->name; };
-	string getPicturePath() { return this->picturePath; };
 	sf::Sprite* getSprite() { return this->picture; };
-	int getAttack() { return this->attack; };
-	int getArmor() { return this->armor; };
-	int getHealth() { return this->health; };
 	bool getSelected() { return this->selected; };
-	int getCriticalDamage() { return this->criticalDamage; };
-	int getCriticalDamage—hance() { return this->criticalDamage—hance; };
-private:
+public:
 	string name;
 	string picturePath;
+	int attack;
+	int armor;
+	int health;
+	int criticalDamage;
+	int criticalDamage—hance;
+
+private:
 	sf::Sprite* picture;
 	int width, height;
 	int x, y;
-
-	int attack = 10;
-	int armor = 100;
-	int health = 100;
-	int criticalDamage = 33;
-	int criticalDamage—hance = 13;
 
 	bool selected = false;
 };

@@ -1,3 +1,7 @@
-fi img/c1.png 1000 20 30
-sec img/c2.png 1000 20 30
-tree img/c3.png 1000 20 30
+fi img/c1.png 1000 20 30 11 20 4 10 10 
+sec img/c2.png 1000 20 30 10 30 3 10 10 
+tree img/c3.png 1000 20 30 10 10 5 10 10 
+img/c3.png img/c3.png 30 30 30 0 0 0 0 0 
+img/c3.png img/c3.png 30 30 30 0 0 0 0 0 
+img/c3.png img/c3.png 30 30 30 0 0 0 0 0 
+img/c3.png img/c3.png 30 30 30 0 0 0 0 0 

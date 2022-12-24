@@ -13,8 +13,12 @@ class PumpingScreen
 public:
 	PumpingScreen();
 	void render(vector<characters> heroes, sf::RenderWindow* window, int gameScore);
-	void update(sf::Event event, vector<characters> &heroes);
+	void update(sf::Event event, vector<characters> &heroes, int& gameScore);
 private:
+	int currentSetting;
+	bool setting;
+	const int settingCount = 4;
+
 	int currentHero;
 	FontManager fontManager;
 

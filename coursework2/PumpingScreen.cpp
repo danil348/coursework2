@@ -5,10 +5,12 @@ PumpingScreen::PumpingScreen()
 	this->clock = new sf::Clock;
 	this->currentHero = 0;
 	this->background = TextureManager::load("img/PumpingScreen.png", 1920, 1080);
-	this->arrow = TextureManager::load("img/bol.jpg", 100, 100, sf::Color(255, 255, 255));
+	this->arrow = TextureManager::load("img/bol.png", 30, 30);
 	this->colorValue = 75;
 	this->increase = true;
-	this->offset = 50;
+	this->offset = 150;
+	this->currentSetting = 0;
+	this->setting = false;
 }
 
 void PumpingScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
@@ -16,23 +18,34 @@ void PumpingScreen::render(vector<characters> heroes, sf::RenderWindow* window, 
 	
 	window->draw(*this->background);
 	window->draw(*heroes[this->currentHero].getSprite()); 
-	window->draw(*this->fontManager.getText(heroes[currentHero].getName(), 50,
+	window->draw(*this->fontManager.getText(heroes[currentHero].name, 50,
 		heroes[this->currentHero].getSelected() == true ? sf::Color::Red : sf::Color::Black, 1200, 100));
 
-	window->draw(*this->fontManager.getText(L"¿Ú‡Í‡: ", 30, sf::Color::Black, 1000, 200));
-	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].getAttack()), 30, sf::Color::Black, 1000 + 350, 200));
+	window->draw(*this->fontManager.getText(L"¿Ú‡Í‡: ", 30,
+		this->setting == true && this->currentSetting == 0 ? sf::Color::Red : sf::Color::Black
+		, 1000, 200));
 
-	window->draw(*this->fontManager.getText(L"¡ÓÌˇ: ", 30, sf::Color::Black, 1000, 200 + this->offset * 1));
-	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].getArmor()), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 1));
+	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].attack), 30, sf::Color::Black, 1000 + 350, 200));
 
-	window->draw(*this->fontManager.getText(L"«‰ÓÓ‚¸Â: ", 30, sf::Color::Black, 1000, 200 + this->offset * 2));
-	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].getHealth()), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 2));
+	window->draw(*this->fontManager.getText(L"¡ÓÌˇ: ", 30,
+		this->setting == true && this->currentSetting == 1 ? sf::Color::Red : sf::Color::Black
+		, 1000, 200 + this->offset * 1));
+	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].armor), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 1));
 
-	window->draw(*this->fontManager.getText(L"ÍËÚ ÛÓÌ: ", 30, sf::Color::Black, 1000, 200 + this->offset * 3));
-	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].getCriticalDamage()), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 3));
+	window->draw(*this->fontManager.getText(L"«‰ÓÓ‚¸Â: ", 30,
+		this->setting == true && this->currentSetting == 2 ? sf::Color::Red : sf::Color::Black
+		, 1000, 200 + this->offset * 2));
+	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].health), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 2));
 
-	window->draw(*this->fontManager.getText(L"¯‡ÌÒ ÍËÚ ÛÓÌ‡: ", 30, sf::Color::Black, 1000, 200 + this->offset * 4));
-	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].getCriticalDamage—hance()), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 4));
+	window->draw(*this->fontManager.getText(L"ÍËÚ ÛÓÌ: ", 30,
+		this->setting == true && this->currentSetting == 3 ? sf::Color::Red : sf::Color::Black
+		, 1000, 200 + this->offset * 3));
+	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].criticalDamage), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 3));
+
+	window->draw(*this->fontManager.getText(L"¯‡ÌÒ ÍËÚ ÛÓÌ‡: ", 30,
+		this->setting == true && this->currentSetting == 4 ? sf::Color::Red : sf::Color::Black
+	, 1000, 200 + this->offset * 4));
+	window->draw(*this->fontManager.getText(to_string(heroes[this->currentHero].criticalDamage—hance), 30, sf::Color::Black, 1000 + 350, 200 + this->offset * 4));
 
 	window->draw(*this->fontManager.getText(L"Œ˜ÍË: ", 30, sf::Color::Black, 20, 20));
 	window->draw(*this->fontManager.getText(to_string(gameScore), 30, sf::Color::Black, 100, 20));
@@ -42,13 +55,17 @@ void PumpingScreen::render(vector<characters> heroes, sf::RenderWindow* window, 
 	window->draw(*this->arrow);
 }
 
-void PumpingScreen::update(sf::Event event, vector<characters> &heroes)
+void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gameScore)
 {
 	this->time = this->clock->getElapsedTime();
-	if (this->time.asMilliseconds() >= 250) {
+	if (this->time.asMilliseconds() >= 200) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 			heroes[this->currentHero].setSelected(false);
 			this->currentHero--;
+
+			this->setting = false;
+			this->currentSetting = 0;
+
 			if (this->currentHero < 0) {
 				this->currentHero = heroes.size() - 1;
 			}
@@ -56,6 +73,10 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes)
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 			heroes[this->currentHero].setSelected(false);
 			this->currentHero++;
+
+			this->setting = false;
+			this->currentSetting = 0;
+			
 			if (this->currentHero > heroes.size() - 1) {
 				this->currentHero = 0;
 			}
@@ -64,10 +85,52 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes)
 			heroes[this->currentHero].setSelected(true);
 		}
 		this->clock->restart();
+
+		for (int i = 0; i < heroes.size(); i++) {
+			if (heroes[i].getSelected() == true) {
+				this->setting = true;
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+					this->currentSetting++;
+					if (this->currentSetting > this->settingCount) {
+						this->currentSetting = 0;
+					}
+				}
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+					this->currentSetting--;
+					if (this->currentSetting < 0) {
+						this->currentSetting = this->settingCount;
+					}
+				}
+			}
+		}
+
+		if (heroes[this->currentHero].getSelected() == true && this->setting == true && gameScore > 0 && 
+			sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) {
+			if (this->currentSetting == 0 && heroes[this->currentHero].attack < 100) {
+				gameScore--;
+				heroes[this->currentHero].attack++;
+			}
+			else if (this->currentSetting == 1 && heroes[this->currentHero].armor < 100) {
+				gameScore--;
+				heroes[this->currentHero].armor++;
+			}
+			else if (this->currentSetting == 2 && heroes[this->currentHero].health < 100) {
+				gameScore--;
+				heroes[this->currentHero].health++;
+			}
+			else if (this->currentSetting == 3 && heroes[this->currentHero].criticalDamage < 100) {
+				gameScore--;
+				heroes[this->currentHero].criticalDamage++;
+			}
+			else if (this->currentSetting == 4 && heroes[this->currentHero].criticalDamage—hance < 100) {
+				gameScore--;
+				heroes[this->currentHero].criticalDamage—hance++;
+			}
+		}
 	}
 
 	if (event.type == sf::Event::KeyReleased) {
-		this->time = sf::seconds(1);
+		this->time = sf::seconds(2);
 	}
 
 
@@ -83,16 +146,5 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes)
 	}
 	else {
 		this->colorValue += 0.5;
-	}
-
-	if (heroes[this->currentHero].getSelected() == true) {
-		if (this->offset < 150) {
-			this->offset += 0.5;
-		}
-	}
-	else {
-		if (this->offset > 50) {
-			this->offset -= 0.5;
-		}
 	}
 }

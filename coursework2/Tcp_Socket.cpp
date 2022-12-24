@@ -57,7 +57,7 @@ string Tcp_Socket::getIp()
 	return this->ip->toString();
 }
 
-void Tcp_Socket::send()
+void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroes)
 {
 	this->packet.clear();
 
@@ -68,9 +68,10 @@ void Tcp_Socket::send()
 	this->socket.send(this->packet);
 }
 
-void Tcp_Socket::receive()
+void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes)
 {
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
+
 		//this->packet >> data;
 		// 
 		//this->packet >> data;
