@@ -102,18 +102,51 @@ void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 	}
 }
 
-void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes, bool& _needWalk)
+void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes, 
+	bool& _needWalk, vector<string>& battle_events)
 {
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
 		this->packet >> _needWalk;
+
+		if (battle_events.size() > 5) {
+			battle_events.erase(battle_events.begin());
+		}
+		string tmp = " ";
+		this->packet >> tmp;
+		if (tmp != "") {
+			battle_events.push_back("enemy: " + tmp);
+		}
 	}
 }
 
-void Tcp_Socket::send(vector<characters>& heroes, bool& _needWalk)
+void Tcp_Socket::send(vector<characters>& heroes, bool& _needWalk, string battle_events)
 {
 	this->packet.clear();
 
 	this->packet << _needWalk;
+	this->packet << battle_events;
+
 
 	this->socket.send(this->packet);
+}
+
+void Tcp_Socket::send(string value)
+{
+	this->packet.clear();
+
+	this->packet << value;
+
+	this->socket.send(this->packet);
+}
+
+void Tcp_Socket::receive(vector<string>& battle_events)
+{
+	if (this->socket.receive(this->packet) == sf::Socket::Done) {
+		if (battle_events.size() > 5) {
+			battle_events.erase(battle_events.begin());
+		}
+		string tmp;
+		this->packet >> tmp;
+		battle_events.push_back(tmp);
+	}
 }

@@ -25,12 +25,16 @@ BattleScreen::BattleScreen()
 	this->characteristicsField->setFillColor(sf::Color(255, 255, 255, 230));
 	this->characteristicsFieldOpponent = new sf::RectangleShape(sf::Vector2f(150, 80));
 	this->characteristicsFieldOpponent->setFillColor(sf::Color(255, 255, 255, 230));
+	this->attackField = new sf::RectangleShape(sf::Vector2f(300, 160));
+	this->attackField->setFillColor(sf::Color(255, 255, 255, 230));
+	this->attackField->setPosition(80, 80);
 	this->currentHero = 0;
+	this->step_knowledge = this->step_not_received;
 }
 
 void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
 {
-	window->draw(*(this->soc_connect_step == this->type_selection || 
+	window->draw(*(this->soc_connect_step == this->type_selection ||
 		this->soc_connect_step == this->data_entry ||
 		this->soc_connect_step == this->connection ? this->soc_background : this->background));
 
@@ -51,22 +55,27 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 	}
 
 	if (this->soc_connect_step == this->data_entry && this->soc_type == this->client) {
-		window->draw(*this->fontManager.getText(this->soc_ip, 50, sf::Color::Black , 30, 400));
-		window->draw(*this->fontManager.getText(this->_soc_port, 50, sf::Color::Black , 30, 500));
+		window->draw(*this->fontManager.getText(this->soc_ip, 50, sf::Color::Black, 30, 400));
+		window->draw(*this->fontManager.getText(this->_soc_port, 50, sf::Color::Black, 30, 500));
 	}
 
 
 
 	//=============
-	if (this->soc_connect_step == this->game && this->receiving_stage != this->heroes_received) {
+	if (this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
 		this->soc_tcp->receive(this->enemyHeroes, heroes);
 		this->receiving_stage = this->heroes_received;
 	}
 	//=============
-	
+
 	if (this->soc_connect_step == this->game && this->receiving_stage == this->heroes_received) {
 		this->renderStrokeTable(window);
 		this->renderHero(window, heroes);
+		this->renderEvents(window);
+	}
+
+	if (this->soc_connect_step == this->game && this->receiving_stage == this->hit) {
+
 	}
 }
 
@@ -75,6 +84,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 	if (this->soc_connect_step == this->connection && this->soc_tcp != NULL) {
 		this->soc_tcp->start();
 		this->soc_connect_step = this->game;
+		this->_clock->restart();
 		if (this->soc_type == this->server) {
 			this->_needWalk = true;
 			this->clock->restart();
@@ -188,14 +198,14 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 	if (this->receiving_stage == this->heroes_received && this->soc_connect_step == this->game) {
 		if (this->_needWalk == true) {
 			if (this->waitingTime(event) == true && this->step == this->character_selection) {
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 					this->clock->restart();
 					this->currentHero++;
 					if (this->currentHero > heroes.size() - 1) {
 						this->currentHero = 0;
 					}
 				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 					this->clock->restart();
 					this->currentHero--;
 					if (this->currentHero < 0) {
@@ -209,14 +219,14 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 			}
 
 			if (this->waitingTime(event) == true && this->step == this->choosing_opponent) {
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 					this->clock->restart();
 					this->currentOpponent++;
 					if (this->currentOpponent > this->enemyHeroes.size() - 1) {
 						this->currentOpponent = 0;
 					}
 				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 					this->clock->restart();
 					this->currentOpponent--;
 					if (this->currentOpponent < 0) {
@@ -228,49 +238,52 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 					this->step = this->hit;
 				}
 			}
+
+			if (this->waitingTime(event) == true && this->step == this->hit) {
+				this->heroeshit(heroes);
+				this->soc_tcp->send((heroes[this->currentHero].name + " hit " + this->enemyHeroes[this->currentOpponent].name +
+					" (-" + to_string(this->attackValue) + "hp)"));
+				this->step = this->hit_made;
+			}
 		}
 
 
 
 
-		if (this->_needWalk == true) {
+		if (this->_needWalk == true && this->soc_connect_step == this->game) {
 			if (this->_waitingTime(event, this->WalkTime) == true) {
-				this->soc_tcp->send(heroes, this->_needWalk);
+				cout << "send" << endl;
+				if (this->step == this->hit_made) {
+					this->soc_tcp->send(heroes, this->_needWalk, (heroes[this->currentHero].name + " hit " + this->enemyHeroes[this->currentOpponent].name +
+						" (-" + to_string(this->attackValue) + "hp)"));
+				}
+				else {
+					if (this->battle_events.size() > 5) {
+						this->battle_events.erase(this->battle_events.begin());
+					}
+					this->battle_events.push_back("player: the step is skipped");
+					this->soc_tcp->send(heroes, this->_needWalk, "the step is skipped");
+				}
 				this->_needWalk = false;
 				this->_time = sf::seconds(0);
 				this->_clock->restart();
 			}
 		}
-		else {
-			this->_waitingTime(event, this->WalkTime);
-			this->soc_tcp->receive(this->enemyHeroes, heroes, this->_needWalk);
+		else if(this->_needWalk == false && this->soc_connect_step == this->game) {
+			if (this->_waitingTime(event, this->WalkTime + 0.05)) {
+				cout << "receive" << endl;
+				this->soc_tcp->receive(this->enemyHeroes, heroes, this->_needWalk, this->battle_events);
+			}
+
 			if (this->_needWalk == true) {
 				this->_time = sf::seconds(0);
 				this->_clock->restart();
 				this->step = this->character_selection;
+				this->currentOpponent = 0;
 				this->currentHero = 0;
 			}
 		}
-
 	}
-
-
-	//=============
-	/*if (this->receiving_stage == this->heroes_received) {
-		for (int i = 0; i < enemyHeroes.size(); i++) {
-			cout << enemyHeroes[i].name << endl;
-			cout << enemyHeroes[i].get_h() << endl;
-			cout << enemyHeroes[i].get_w() << endl;
-			cout << enemyHeroes[i].armor << endl;
-			cout << enemyHeroes[i].attack << endl;
-			cout << enemyHeroes[i].criticalDamage << endl;
-			cout << enemyHeroes[i].criticalDamageÑhance << endl;
-			cout << enemyHeroes[i].health << endl;
-			cout << enemyHeroes[i].name << endl;
-			cout << enemyHeroes[i].picturePath << endl << endl;
-		}
-	}*/
-	//=============
 }
 
 void BattleScreen::keyPressed(string& value) 
@@ -318,7 +331,7 @@ void BattleScreen::keyPressed(string& value)
 	
 }
 
-bool BattleScreen::_waitingTime(sf::Event event, int time)
+bool BattleScreen::_waitingTime(sf::Event event, float time)
 {
 	this->_time = this->_clock->getElapsedTime();
 	return (this->_time.asSeconds() >= time);
@@ -380,5 +393,28 @@ void BattleScreen::renderHero(sf::RenderWindow* window, vector<characters>& hero
 		window->draw(*this->fontManager.getText("Health: " + to_string(enemyHeroes[i].health), 16, sf::Color::Black, enemyHeroes[i].get_x() + 20, enemyHeroes[i].get_y() - 10));
 
 		
+	}
+}
+
+void BattleScreen::heroeshit(vector<characters>& heroes)
+{
+	if (this->battle_events.size() > 5) {
+		this->battle_events.erase(this->battle_events.begin());
+	}
+	this->battle_events.push_back("player: " + heroes[this->currentHero].name + " hit " + this->enemyHeroes[this->currentOpponent].name +
+		" (-" + to_string(this->attackValue) + "hp)");
+}
+
+void BattleScreen::renderEvents(sf::RenderWindow* window)
+{
+	window->draw(*this->attackField);
+
+	for (int i = 0; i < this->battle_events.size(); i++) {
+		if (this->battle_events[i][0] == 'e') {
+			window->draw(*this->fontManager.getText(this->battle_events[i], 16, sf::Color::Red, 100, 100 + 20 * i));
+		}
+		else {
+			window->draw(*this->fontManager.getText(this->battle_events[i], 16, sf::Color::Black, 100, 100 + 20 * i));
+		}
 	}
 }

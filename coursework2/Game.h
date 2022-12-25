@@ -20,10 +20,8 @@ public:
 public:
 	void update();
 	void render();
-	void sendData();
 public:
 	void gameRun();
-	void socketRun();
 public:
 	void loadFromFile();
 	void saveToFile();
@@ -31,7 +29,6 @@ private:
 	int gameScore;
 	sf::RenderWindow* window;
 	sf::Event event;
-	Tcp_Socket* tcp_socket;
 
 	vector<characters> heroes;
 	vector<characters> enemyHeroes;

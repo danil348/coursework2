@@ -4,7 +4,6 @@
 #include "characters.h"
 
 #define DEBUG
-//#define SOCKET
 
 using namespace std;
 
@@ -19,8 +18,11 @@ public:
 	bool connect();
 	void send(vector<characters>& enemyHeroes, vector<characters>& heroes);
 	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes);
-	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes, bool& _needWalk);
-	void send(vector<characters>& heroes, bool& _needWalk);
+	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes, 
+		bool& _needWalk, vector<string>& battle_events);
+	void send(vector<characters>& heroes, bool& _needWalk, string battle_events);
+	void send(string value);
+	void receive(vector<string>& battle_events);
 public:
 	unsigned short getPort();
 	string getIp();
