@@ -21,6 +21,11 @@ BattleScreen::BattleScreen()
 	this->playerTime->setPosition(760, 1000);
 	this->enemyTime = new sf::RectangleShape(sf::Vector2f(100, 30));
 	this->enemyTime->setPosition(1060, 1000);
+	this->characteristicsField = new sf::RectangleShape(sf::Vector2f(300, 120));
+	this->characteristicsField->setFillColor(sf::Color(255, 255, 255, 230));
+	this->characteristicsFieldOpponent = new sf::RectangleShape(sf::Vector2f(150, 80));
+	this->characteristicsFieldOpponent->setFillColor(sf::Color(255, 255, 255, 230));
+	this->currentHero = 0;
 }
 
 void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
@@ -182,6 +187,53 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 
 	if (this->receiving_stage == this->heroes_received && this->soc_connect_step == this->game) {
 		if (this->_needWalk == true) {
+			if (this->waitingTime(event) == true && this->step == this->character_selection) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+					this->clock->restart();
+					this->currentHero++;
+					if (this->currentHero > heroes.size() - 1) {
+						this->currentHero = 0;
+					}
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+					this->clock->restart();
+					this->currentHero--;
+					if (this->currentHero < 0) {
+						this->currentHero = heroes.size() - 1;
+					}
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+					this->clock->restart();
+					this->step = this->choosing_opponent;
+				}
+			}
+
+			if (this->waitingTime(event) == true && this->step == this->choosing_opponent) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+					this->clock->restart();
+					this->currentOpponent++;
+					if (this->currentOpponent > this->enemyHeroes.size() - 1) {
+						this->currentOpponent = 0;
+					}
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+					this->clock->restart();
+					this->currentOpponent--;
+					if (this->currentOpponent < 0) {
+						this->currentOpponent = this->enemyHeroes.size() - 1;
+					}
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+					this->clock->restart();
+					this->step = this->hit;
+				}
+			}
+		}
+
+
+
+
+		if (this->_needWalk == true) {
 			if (this->_waitingTime(event, this->WalkTime) == true) {
 				this->soc_tcp->send(heroes, this->_needWalk);
 				this->_needWalk = false;
@@ -195,9 +247,13 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 			if (this->_needWalk == true) {
 				this->_time = sf::seconds(0);
 				this->_clock->restart();
+				this->step = this->character_selection;
+				this->currentHero = 0;
 			}
 		}
+
 	}
+
 
 	//=============
 	/*if (this->receiving_stage == this->heroes_received) {
@@ -292,6 +348,17 @@ void BattleScreen::renderHero(sf::RenderWindow* window, vector<characters>& hero
 		heroes[i].set_y(800);
 		window->draw(*heroes[i].getSprite());
 		window->draw(*this->fontManager.getText(heroes[i].name, 16, sf::Color::Black, heroes[i].get_x() + 70, heroes[i].get_y() + 150));
+
+		if (i == this->currentHero) {
+			this->characteristicsField->setPosition(heroes[i].get_x() + 10, heroes[i].get_y() - 100);
+			window->draw(*this->characteristicsField);
+
+			window->draw(*this->fontManager.getText("Armor: " + to_string(heroes[i].armor), 16, sf::Color::Black, heroes[i].get_x() + 20, heroes[i].get_y() - 90));
+			window->draw(*this->fontManager.getText("Attack: " + to_string(heroes[i].attack), 16, sf::Color::Black, heroes[i].get_x() + 20, heroes[i].get_y() - 70));
+			window->draw(*this->fontManager.getText("CriticalDamage: " + to_string(heroes[i].criticalDamage), 16, sf::Color::Black, heroes[i].get_x() + 20, heroes[i].get_y() - 50));
+			window->draw(*this->fontManager.getText("CriticalDamageChance: " + to_string(heroes[i].criticalDamageÑhance), 16, sf::Color::Black, heroes[i].get_x() + 20, heroes[i].get_y() - 30));
+			window->draw(*this->fontManager.getText("Health: " + to_string(heroes[i].health), 16, sf::Color::Black, heroes[i].get_x() + 20, heroes[i].get_y() - 10));
+		}
 	}
 	for (int i = 0; i < enemyHeroes.size(); i++) {
 		enemyHeroes[i].set_w_h(200, 200);
@@ -299,5 +366,19 @@ void BattleScreen::renderHero(sf::RenderWindow* window, vector<characters>& hero
 		enemyHeroes[i].set_y(800);
 		window->draw(*enemyHeroes[i].getSprite());
 		window->draw(*this->fontManager.getText(enemyHeroes[i].name, 16, sf::Color::Black, enemyHeroes[i].get_x() + 70, enemyHeroes[i].get_y() + 150));
+
+		this->characteristicsFieldOpponent->setPosition(enemyHeroes[i].get_x() + 10, enemyHeroes[i].get_y() - 60);
+		if (i == this->currentOpponent) {
+			this->characteristicsFieldOpponent->setOutlineThickness(3);
+			this->characteristicsFieldOpponent->setOutlineColor(sf::Color(0, 0, 0));
+		}
+		window->draw(*this->characteristicsFieldOpponent);
+		this->characteristicsFieldOpponent->setOutlineThickness(0);
+
+		window->draw(*this->fontManager.getText("Armor: " + to_string(enemyHeroes[i].armor), 16, sf::Color::Black, enemyHeroes[i].get_x() + 20, enemyHeroes[i].get_y() - 50));
+		window->draw(*this->fontManager.getText("Attack: " + to_string(enemyHeroes[i].attack), 16, sf::Color::Black, enemyHeroes[i].get_x() + 20, enemyHeroes[i].get_y() - 30));
+		window->draw(*this->fontManager.getText("Health: " + to_string(enemyHeroes[i].health), 16, sf::Color::Black, enemyHeroes[i].get_x() + 20, enemyHeroes[i].get_y() - 10));
+
+		
 	}
 }
