@@ -19,6 +19,8 @@ public:
 	bool connect();
 	void send(vector<characters>& enemyHeroes, vector<characters>& heroes);
 	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes);
+	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes, bool& _needWalk);
+	void send(vector<characters>& heroes, bool& _needWalk);
 public:
 	unsigned short getPort();
 	string getIp();

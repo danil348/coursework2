@@ -12,8 +12,8 @@ public:
 	void set_w_h(int width, int height);
 	void setName(string name) { this->name = name; };
 	void setPicturePath(string picturePath) { this->picturePath = picturePath; };
-	void set_x(int x) { this->x = x; };
-	void set_y(int y) { this->y = y; };
+	void set_x(int x) { this->picture->setPosition(x, this->y); this->x = x; };
+	void set_y(int y) { this->picture->setPosition(this->x, y); this->y = y; };
 	void setSprite();
 	void setSelected(bool selected) { this->selected = selected; };
 public:

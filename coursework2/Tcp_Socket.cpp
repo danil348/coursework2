@@ -61,28 +61,59 @@ void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroe
 {
 	this->packet.clear();
 
-	if (this->TcpType == this->client) {
-		this->packet << "client send mes";
+	this->packet << int(heroes.size());
+	for (int i = 0; i < heroes.size(); i++) {
+		this->packet << heroes[i].get_h();
+		this->packet << heroes[i].get_w();
+		this->packet << heroes[i].armor;
+		this->packet << heroes[i].attack;
+		this->packet << heroes[i].criticalDamage;
+		this->packet << heroes[i].criticalDamageÑhance;
+		this->packet << heroes[i].health;
+		this->packet << heroes[i].name;
+		this->packet << heroes[i].picturePath;
 	}
-	else {
-		this->packet << "server send mes";
-	}
-	//this->packet << data;
-	// 
-	//this->packet << data;
 
 	this->socket.send(this->packet);
 }
 
 void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes)
 {
-	string data;
+	int count;
+	int w, h;
+	characters* tmpCharacters;
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
-		this->packet >> data;
-		cout << data;
-
-		//this->packet >> data;
-		// 
-		//this->packet >> data;
+		this->packet >> count;
+		for (int i = 0; i < count; i++) {
+			tmpCharacters = new characters;
+			this->packet >> h;
+			this->packet >> w;
+			tmpCharacters->set_w_h(w, h);
+			this->packet >> tmpCharacters->armor;
+			this->packet >> tmpCharacters->attack;
+			this->packet >> tmpCharacters->criticalDamage;
+			this->packet >> tmpCharacters->criticalDamageÑhance;
+			this->packet >> tmpCharacters->health;
+			this->packet >> tmpCharacters->name;
+			this->packet >> tmpCharacters->picturePath;
+			tmpCharacters->setSprite();
+			enemyHeroes.push_back(*tmpCharacters);
+		}
 	}
+}
+
+void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes, bool& _needWalk)
+{
+	if (this->socket.receive(this->packet) == sf::Socket::Done) {
+		this->packet >> _needWalk;
+	}
+}
+
+void Tcp_Socket::send(vector<characters>& heroes, bool& _needWalk)
+{
+	this->packet.clear();
+
+	this->packet << _needWalk;
+
+	this->socket.send(this->packet);
 }
