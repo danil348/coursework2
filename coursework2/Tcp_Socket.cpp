@@ -74,7 +74,7 @@ void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroe
 		this->packet << heroes[i].picturePath;
 	}
 
-	this->packet << send;
+	this->packet << int(send);
 	this->socket.send(this->packet);
 }
 
