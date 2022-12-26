@@ -57,7 +57,7 @@ string Tcp_Socket::getIp()
 	return this->ip->toString();
 }
 
-void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroes)
+void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroes, bool send)
 {
 	this->packet.clear();
 
@@ -74,16 +74,18 @@ void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroe
 		this->packet << heroes[i].picturePath;
 	}
 
+	this->packet << send;
 	this->socket.send(this->packet);
 }
 
-bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes)
+bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes, bool& send)
 {
 	int count;
 	int w, h;
 	characters* tmpCharacters;
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
 		this->packet >> count;
+		cout << endl << count << endl;
 		for (int i = 0; i < count; i++) {
 			tmpCharacters = new characters;
 			this->packet >> h;
@@ -99,6 +101,10 @@ bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 			tmpCharacters->setSprite();
 			enemyHeroes.push_back(*tmpCharacters);
 		}
+
+		this->packet >> count;
+		send = count;
+		cout << send;
 	}
 
 	return enemyHeroes.size() != 0;

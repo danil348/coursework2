@@ -67,7 +67,7 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 
 	//=============
 	if (this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
-		while (this->soc_tcp->receive(this->enemyHeroes, heroes) == false);
+		while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->send) == false);
 		this->receiving_stage = this->heroes_received;
 		this->music->play_music(1);
 	}
@@ -101,8 +101,9 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 
 
 	//=============
-	if (this->soc_connect_step == this->game && this->receiving_stage != this->heroes_received) {
-		this->soc_tcp->send(this->enemyHeroes, heroes);
+	if (this->soc_connect_step == this->game && this->send == false) {
+		cout << " asdasd";
+		this->soc_tcp->send(this->enemyHeroes, heroes, (this->receiving_stage == this->heroes_received));
 	}
 	//=============
 

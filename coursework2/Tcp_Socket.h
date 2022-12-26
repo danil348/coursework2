@@ -16,8 +16,8 @@ public:
 	void start();
 	bool accept();
 	bool connect();
-	void send(vector<characters>& enemyHeroes, vector<characters>& heroes);
-	bool receive(vector<characters>& enemyHeroes, vector<characters>& heroes);
+	void send(vector<characters>& enemyHeroes, vector<characters>& heroes, bool send);
+	bool receive(vector<characters>& enemyHeroes, vector<characters>& heroes, bool& send);
 	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes, 
 		bool& _needWalk, vector<string>& battle_events);
 	void send(vector<characters>& heroes, bool& _needWalk, string battle_events, int currentHero, int currentOpponent, int damage);

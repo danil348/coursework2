@@ -59,4 +59,6 @@ private:
 	int attackValue;
 
 	int currentDamage;
+
+	bool send = false;
 };
