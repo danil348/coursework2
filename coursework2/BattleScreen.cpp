@@ -31,6 +31,9 @@ BattleScreen::BattleScreen()
 	this->currentHero = 0;
 	this->step_knowledge = this->step_not_received;
 	this->currentDamage = 0;
+	this->music = new MusicManager;
+	music->music_load("music/elearning-clock-ticking.wav");
+	music->music_load("music/Minecraft.wav");
 }
 
 void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
@@ -66,6 +69,7 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 	if (this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
 		while (this->soc_tcp->receive(this->enemyHeroes, heroes) == false);
 		this->receiving_stage = this->heroes_received;
+		this->music->play_music(1);
 	}
 	//=============
 
@@ -74,14 +78,16 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 		this->renderHero(window, heroes);
 		this->renderEvents(window);
 	}
-
-	if (this->soc_connect_step == this->game && this->receiving_stage == this->hit) {
-
-	}
 }
 
 void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& gameScore)
 {
+	if (this->step == this->game) {
+		//
+		// ===
+		//
+	}
+
 	if (this->soc_connect_step == this->connection && this->soc_tcp != NULL) {
 		this->soc_tcp->start();
 		this->soc_connect_step = this->game;
@@ -119,6 +125,15 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 			this->soc_port = NULL;
 			this->_soc_port = "Port: ";
 			this->enemyHeroes.clear();
+			this->music->stop_music(0);
+			this->music->stop_music(1);
+			this->_clock->restart();
+			this->step_knowledge = this->step_not_received;
+			this->step = this->character_selection;
+			this->_needWalk = false;
+			this->battle_events.clear();
+			this->attackValue = 0;
+			this->currentDamage = 0;
 		}
 	}
 
@@ -198,6 +213,9 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 
 	if (this->receiving_stage == this->heroes_received && this->soc_connect_step == this->game) {
 		if (this->_needWalk == true) {
+			if (this->_clock->getElapsedTime().asSeconds() > 10) {
+				this->music->play_music(0);
+			}
 			if (this->waitingTime(event) == true && this->step == this->character_selection) {
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 					this->clock->restart();
@@ -284,6 +302,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 				this->_needWalk = false;
 				this->_time = sf::seconds(0);
 				this->_clock->restart();
+				this->music->stop_music(0);
 			}
 		}
 		else if(this->_needWalk == false && this->soc_connect_step == this->game) {
@@ -419,7 +438,7 @@ void BattleScreen::heroeshit(vector<characters>& heroes)
 		this->battle_events.erase(this->battle_events.begin());
 	}
 	this->battle_events.push_back("player: " + heroes[this->currentHero].name + " hit " + this->enemyHeroes[this->currentOpponent].name +
-		" (-" + to_string(this->attackValue) + "hp)");
+		" (-" + to_string(this->currentDamage) + "hp)");
 }
 
 void BattleScreen::renderEvents(sf::RenderWindow* window)

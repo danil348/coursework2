@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "GameScreen.h"
 #include "Tcp_Socket.h"
+#include "Music.h"
 #include <Windows.h>
 #include <string>
 
@@ -38,6 +39,7 @@ private:
 	unsigned short soc_port;
 	string _soc_port;
 	Tcp_Socket* soc_tcp;
+	MusicManager* music;
 
 	HWND name;
 	vector<characters> enemyHeroes;
