@@ -55,4 +55,6 @@ private:
 	vector<string> battle_events;
 
 	int attackValue;
+
+	int currentDamage;
 };

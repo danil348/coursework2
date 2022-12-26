@@ -23,6 +23,8 @@ public:
 	int get_y() { return this->y; };	
 	sf::Sprite* getSprite() { return this->picture; };
 	bool getSelected() { return this->selected; };
+	
+	void checkLive();
 public:
 	string name;
 	string picturePath;
@@ -31,6 +33,7 @@ public:
 	int health;
 	int criticalDamage;
 	int criticalDamage—hance;
+	bool islive = true;
 
 private:
 	sf::Sprite* picture;

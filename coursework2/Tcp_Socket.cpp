@@ -77,7 +77,7 @@ void Tcp_Socket::send(vector<characters>& enemyHeroes, vector<characters>& heroe
 	this->socket.send(this->packet);
 }
 
-void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes)
+bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes)
 {
 	int count;
 	int w, h;
@@ -100,12 +100,15 @@ void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 			enemyHeroes.push_back(*tmpCharacters);
 		}
 	}
+
+	return enemyHeroes.size() != 0;
 }
 
 void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes, 
 	bool& _needWalk, vector<string>& battle_events)
 {
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
+
 		this->packet >> _needWalk;
 
 		if (battle_events.size() > 5) {
@@ -116,16 +119,33 @@ void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 		if (tmp != "") {
 			battle_events.push_back("enemy: " + tmp);
 		}
+
+		int tmpidx = -1;
+		int tmpidx2 = -1;
+		int tmpidx3 = -1;
+		this->packet >> tmpidx;
+		this->packet >> tmpidx2;
+		this->packet >> tmpidx3;
+
+		if (tmpidx >= 0 && tmpidx2 >= 0 && tmpidx3 >= 0) {
+			enemyHeroes[tmpidx].health -= heroes[tmpidx2].attack;
+			heroes[tmpidx2].health -= tmpidx3;
+
+			enemyHeroes[tmpidx].checkLive();
+			heroes[tmpidx2].checkLive();
+		}
 	}
 }
 
-void Tcp_Socket::send(vector<characters>& heroes, bool& _needWalk, string battle_events)
+void Tcp_Socket::send(vector<characters>& heroes, bool& _needWalk, string battle_events, int currentHero, int currentOpponent, int damage)
 {
 	this->packet.clear();
 
 	this->packet << _needWalk;
 	this->packet << battle_events;
-
+	this->packet << currentHero;
+	this->packet << currentOpponent;
+	this->packet << damage;
 
 	this->socket.send(this->packet);
 }
@@ -139,7 +159,7 @@ void Tcp_Socket::send(string value)
 	this->socket.send(this->packet);
 }
 
-void Tcp_Socket::receive(vector<string>& battle_events)
+void Tcp_Socket::receive(vector<string>& battle_events, vector<characters>& heroes, vector<characters>& enemyHeroes)
 {
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
 		if (battle_events.size() > 5) {

@@ -27,3 +27,11 @@ void characters::setSprite()
 		this->picture = TextureManager::load(picturePath, 10, 10);
 	}
 }
+
+void characters::checkLive() 
+{
+	if (this->health <= 0) {
+		this->health = 0;
+		this->islive = false;
+	}
+}

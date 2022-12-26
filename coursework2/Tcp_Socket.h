@@ -17,12 +17,12 @@ public:
 	bool accept();
 	bool connect();
 	void send(vector<characters>& enemyHeroes, vector<characters>& heroes);
-	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes);
+	bool receive(vector<characters>& enemyHeroes, vector<characters>& heroes);
 	void receive(vector<characters>& enemyHeroes, vector<characters>& heroes, 
 		bool& _needWalk, vector<string>& battle_events);
-	void send(vector<characters>& heroes, bool& _needWalk, string battle_events);
+	void send(vector<characters>& heroes, bool& _needWalk, string battle_events, int currentHero, int currentOpponent, int damage);
 	void send(string value);
-	void receive(vector<string>& battle_events);
+	void receive(vector<string>& battle_events, vector<characters>& heroes, vector<characters>& enemyHeroes);
 public:
 	unsigned short getPort();
 	string getIp();

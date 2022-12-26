@@ -30,6 +30,7 @@ BattleScreen::BattleScreen()
 	this->attackField->setPosition(80, 80);
 	this->currentHero = 0;
 	this->step_knowledge = this->step_not_received;
+	this->currentDamage = 0;
 }
 
 void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
@@ -63,7 +64,7 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 
 	//=============
 	if (this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
-		this->soc_tcp->receive(this->enemyHeroes, heroes);
+		while (this->soc_tcp->receive(this->enemyHeroes, heroes) == false);
 		this->receiving_stage = this->heroes_received;
 	}
 	//=============
@@ -212,7 +213,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 						this->currentHero = heroes.size() - 1;
 					}
 				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && heroes[this->currentHero].islive == true) {
 					this->clock->restart();
 					this->step = this->choosing_opponent;
 				}
@@ -233,7 +234,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 						this->currentOpponent = this->enemyHeroes.size() - 1;
 					}
 				}
-				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && this->enemyHeroes[this->currentOpponent].islive == true) {
 					this->clock->restart();
 					this->step = this->hit;
 				}
@@ -254,15 +255,31 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 			if (this->_waitingTime(event, this->WalkTime) == true) {
 				cout << "send" << endl;
 				if (this->step == this->hit_made) {
+					if (heroes[this->currentHero].islive == true && this->enemyHeroes[this->currentOpponent].islive == true) {
+						if (rand() % 101 < heroes[this->currentHero].criticalDamageÑhance) {
+							this->currentDamage = heroes[this->currentHero].criticalDamage;
+						}
+						else {
+							this->currentDamage = heroes[this->currentHero].attack;
+						}
+
+						heroes[this->currentHero].health -= this->enemyHeroes[this->currentOpponent].attack;
+						heroes[this->currentHero].checkLive();
+						this->enemyHeroes[this->currentOpponent].health -= this->currentDamage;
+						this->enemyHeroes[this->currentOpponent].checkLive();
+					}
+
+
+
 					this->soc_tcp->send(heroes, this->_needWalk, (heroes[this->currentHero].name + " hit " + this->enemyHeroes[this->currentOpponent].name +
-						" (-" + to_string(this->attackValue) + "hp)"));
+						" (-" + to_string(this->currentDamage) + "hp)"), this->currentHero, this->currentOpponent, this->currentDamage);
 				}
 				else {
 					if (this->battle_events.size() > 5) {
 						this->battle_events.erase(this->battle_events.begin());
 					}
 					this->battle_events.push_back("player: the step is skipped");
-					this->soc_tcp->send(heroes, this->_needWalk, "the step is skipped");
+					this->soc_tcp->send(heroes, this->_needWalk, "the step is skipped", -1, -1, -1);
 				}
 				this->_needWalk = false;
 				this->_time = sf::seconds(0);
