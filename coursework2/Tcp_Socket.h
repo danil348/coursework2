@@ -22,7 +22,9 @@ public:
 		bool& _needWalk, vector<string>& battle_events);
 	void send(vector<characters>& heroes, bool& _needWalk, string battle_events, int currentHero, int currentOpponent, int damage);
 	void send(string value);
+	void send(bool value);
 	void receive(vector<string>& battle_events, vector<characters>& heroes, vector<characters>& enemyHeroes);
+	bool receive();
 public:
 	unsigned short getPort();
 	string getIp();

@@ -61,4 +61,6 @@ private:
 	int currentDamage;
 
 	bool send = false;
+
+	bool flag = false;
 };

@@ -82,6 +82,7 @@ bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 {
 	int count;
 	int w, h;
+	enemyHeroes.clear();
 	characters* tmpCharacters;
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
 		this->packet >> count;
@@ -165,6 +166,15 @@ void Tcp_Socket::send(string value)
 	this->socket.send(this->packet);
 }
 
+void Tcp_Socket::send(bool value)
+{
+	this->packet.clear();
+
+	this->packet << value;
+
+	this->socket.send(this->packet);
+}
+
 void Tcp_Socket::receive(vector<string>& battle_events, vector<characters>& heroes, vector<characters>& enemyHeroes)
 {
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
@@ -175,4 +185,14 @@ void Tcp_Socket::receive(vector<string>& battle_events, vector<characters>& hero
 		this->packet >> tmp;
 		battle_events.push_back(tmp);
 	}
+}
+
+bool Tcp_Socket::receive()
+{
+	bool value;
+	if (this->socket.receive(this->packet) == sf::Socket::Done) {
+		this->packet >> value;
+		return value;
+	}
+	return false;
 }

@@ -64,14 +64,41 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 	}
 
 
+	if (this->soc_type == this->server && this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
+		while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->send) == false) {
+			this->soc_tcp->send(false);
+		}
+		this->soc_tcp->send(true);
+		this->receiving_stage = this->heroes_received;
+	}
+
+	if (this->soc_type == this->client && this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
+		while (this->soc_tcp->receive() == false) {
+			this->soc_tcp->send(this->enemyHeroes, heroes, (this->receiving_stage == this->heroes_received));
+		}
+	}
+
+	if (this->soc_type == this->client && this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
+		while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->send) == false) {
+			this->soc_tcp->send(false);
+		}
+		this->soc_tcp->send(true);
+		this->receiving_stage = this->heroes_received;
+	}
+
+	if (this->soc_type == this->server && this->soc_connect_step == this->game && flag == false) {
+		while (this->soc_tcp->receive() == false) {
+			this->soc_tcp->send(this->enemyHeroes, heroes, (this->receiving_stage == this->heroes_received));
+		}
+		flag = true;
+	}
 
 	//=============
-	if (this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
+	/*if (this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
 		while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->send) == false) {
 		}
 		this->receiving_stage = this->heroes_received;
-		this->music->play_music(1);
-	}
+	}*/
 	//=============
 
 	if (this->soc_connect_step == this->game && this->receiving_stage == this->heroes_received) {
@@ -102,10 +129,11 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 
 
 	//=============
-	if (this->soc_connect_step == this->game && this->send == false) {
+	/*if (this->soc_connect_step == this->game && this->send == false) {
 		cout << (this->receiving_stage == this->heroes_received);
 		this->soc_tcp->send(this->enemyHeroes, heroes, (this->receiving_stage == this->heroes_received));
-	}
+		this->soc_tcp->receive(this->enemyHeroes, heroes, this->send);
+	}*/
 	//=============
 
 	
@@ -308,7 +336,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 			}
 		}
 		else if(this->_needWalk == false && this->soc_connect_step == this->game) {
-			if (this->_waitingTime(event, this->WalkTime + 0.05)) {
+			if (this->_waitingTime(event, this->WalkTime)) {
 				cout << "receive" << endl;
 				this->soc_tcp->receive(this->enemyHeroes, heroes, this->_needWalk, this->battle_events);
 			}
