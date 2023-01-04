@@ -317,19 +317,6 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 						this->enemyHeroes[this->currentOpponent].checkLive();
 					}
 
-					/*if (this->soc_type == this->server && this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
-		while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->send) == false) {
-			this->soc_tcp->send(false);
-		}
-		this->soc_tcp->send(true);
-		this->receiving_stage = this->heroes_received;
-	}
-
-	if (this->soc_type == this->client && this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
-		while (this->soc_tcp->receive() == false) {
-			this->soc_tcp->send(this->enemyHeroes, heroes, (this->receiving_stage == this->heroes_received));
-		}
-	}*/
 					this->soc_tcp->send(heroes, this->_needWalk, (heroes[this->currentHero].name + " hit " + this->enemyHeroes[this->currentOpponent].name +
 						" (-" + to_string(this->currentDamage) + "hp)"), this->currentHero, this->currentOpponent, this->currentDamage);
 				}
@@ -349,11 +336,7 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 		}
 		else if(this->_needWalk == false && this->soc_connect_step == this->game) {
 			if (this->_waitingTime(event, this->WalkTime)) {
-				cout << "receive" << endl;
-				while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->_needWalk, this->battle_events) == false) {
-					this->soc_tcp->send(false);
-				}
-				this->soc_tcp->send(true);
+				while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->_needWalk, this->battle_events) == false);
 			}
 
 			if (this->_needWalk == true) {
