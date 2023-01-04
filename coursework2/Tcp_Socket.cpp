@@ -111,11 +111,13 @@ bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 	return enemyHeroes.size() != 0;
 }
 
-void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes, 
+bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& heroes, 
 	bool& _needWalk, vector<string>& battle_events)
 {
+	int q;
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
 
+		this->packet >> q;
 		this->packet >> _needWalk;
 
 		if (battle_events.size() > 5) {
@@ -142,12 +144,14 @@ void Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 			heroes[tmpidx2].checkLive();
 		}
 	}
+	return q == -1;
 }
 
 void Tcp_Socket::send(vector<characters>& heroes, bool& _needWalk, string battle_events, int currentHero, int currentOpponent, int damage)
 {
 	this->packet.clear();
 
+	this->packet << -1;
 	this->packet << _needWalk;
 	this->packet << battle_events;
 	this->packet << currentHero;
