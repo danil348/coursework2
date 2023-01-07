@@ -13,9 +13,6 @@ Game::Game()
 	this->window->setFramerateLimit(144);
 	this->window->setVerticalSyncEnabled(false);
 
-	//init items
-	// 
-	//init items
 	this->menu.setRunning(true);
 }
 
@@ -23,10 +20,8 @@ Game::~Game()
 {
 	this->saveToFile();
 	delete this->window;
-
-	//delete items
-	// 
-	//delete items
+	delete &this->pumpingScreen;
+	delete &this->menu;
 }
 
 void Game::gameRun()

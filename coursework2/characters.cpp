@@ -35,3 +35,28 @@ void characters::checkLive()
 		this->islive = false;
 	}
 }
+
+int& characters::getCharacteristic(int characteristicNumber)
+{
+	switch (characteristicNumber) {
+	case this->_attack: return this->attack;
+	case this->_armor: return this->armor;
+	case this->_health: return this->health;
+	case this->_criticalDamage: return this->criticalDamage;
+	case this->_criticalDamage—hance: return this->criticalDamage—hance;
+	default: return *new int;
+	}
+}
+
+string characters::getCharacteristicName(int characteristicNumber)
+{
+	switch (characteristicNumber) {
+	case this->_attack: return "Attack";
+	case this->_armor: return "Armor";
+	case this->_health: return "Health";
+	case this->_criticalDamage: return "CriticalDamage";
+	case this->_criticalDamage—hance: return "CriticalDamageChance";
+	default: return *new string;
+	}
+}
+

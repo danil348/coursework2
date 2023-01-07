@@ -11,17 +11,12 @@ Menu::Menu()
 void Menu::render(sf::RenderWindow* window)
 {
 	window->draw(*this->background);
-	window->draw(*this->fontM.getText(L"Прокачка", 50,
-		this->currentItem == 0 ? sf::Color::Red : sf::Color::Black
-		, 30, 400));
 
-	window->draw(*this->fontM.getText(L"Битва", 50,
-		this->currentItem == 1 ? sf::Color::Red : sf::Color::Black
-		, 30, 500));
-
-	window->draw(*this->fontM.getText(L"Настройки", 50,
-		this->currentItem == 2 ? sf::Color::Red : sf::Color::Black
-		, 30, 600));
+	for (int i = 0; i < this->ITEMS_COUNT; i++) {
+		window->draw(*this->fontM.getText(menuItems[i], 50,
+			this->currentItem == i ? sf::Color::Red : sf::Color::Black
+			, 30, 400 + 100 * i));
+	}
 }
 
 void Menu::update(sf::Event event)

@@ -8,4 +8,6 @@ int main()
 	Game game;
 
 	game.gameRun();
+
+	return 1;
 }

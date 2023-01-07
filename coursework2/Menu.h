@@ -26,4 +26,7 @@ private:
 
 	sf::Clock* clock;
 	sf::Time time;
+
+	wstring menuItems[3] = { L"Прокачка",L"битва",L"Настройки" };
+	const int ITEMS_COUNT = 3;
 };

@@ -34,7 +34,11 @@ public:
 	int criticalDamage;
 	int criticalDamage—hance;
 	bool islive = true;
-
+public:
+	int characteristicCount = 5;
+	int& getCharacteristic(int characteristicNumber);
+	string getCharacteristicName(int characteristicNumber);
+	enum { _attack, _armor, _health, _criticalDamage, _criticalDamage—hance } characteristic;
 private:
 	sf::Sprite* picture;
 	int width, height;

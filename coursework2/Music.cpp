@@ -3,8 +3,9 @@
 void MusicManager::music_load(string file) {
     sf::Music* music;
     music = new sf::Music;
-    if (music->openFromFile(file) == false)
+    if (music->openFromFile(file) == false) {
         return; // error
+    }
     music->setVolume(50.f);
     this->musics.push_back(music);
     this->state.push_back(0);

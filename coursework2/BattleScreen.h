@@ -20,7 +20,9 @@ public:
 	void heroeshit(vector<characters>& heroes);
 	void renderEvents(sf::RenderWindow* window);
 private:
-	void keyPressed(string& value);
+	string getHitString(characters hero);
+	void restart();
+	void keyPressed(string& value, sf::Event event);
 
 	sf::Time _time;
 	sf::Clock* _clock;
