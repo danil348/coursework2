@@ -13,9 +13,11 @@ void MusicManager::music_load(string file) {
 
 void MusicManager::play_music(int numb)
 {
-    if (this->state[numb] == 0) {
-        this->musics[numb]->play();
-        this->state[numb] = 1;
+    if (Setting::sound == true) {
+        if (this->state[numb] == 0) {
+            this->musics[numb]->play();
+            this->state[numb] = 1;
+        }
     }
 }
 
@@ -24,5 +26,19 @@ void MusicManager::stop_music(int numb)
     if (this->state[numb] == 1) {
         this->musics[numb]->stop();
         this->state[numb] = 0;
+    }
+}
+
+void MusicManager::update() 
+{
+    if (Setting::sound == false) {
+        for (int i = 0; i < this->state.size(); i++) {
+            this->musics[i]->setVolume(0.0f);
+        }
+    }
+    else {
+        for (int i = 0; i < this->state.size(); i++) {
+            this->musics[i]->setVolume(50.0f);
+        }
     }
 }

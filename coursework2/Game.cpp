@@ -1,15 +1,25 @@
 #include "Game.h"
 
+bool Setting::sound = true;
+bool Setting::fullscreen = false;
+int Setting::screenWidth = 1920;
+int Setting::screenHeight = 1080;
+int Setting::resolution[4][2] =
+{
+	{1920,1080},
+	{1600,900},
+	{1440,900},
+	{1280,1024}
+};
+
 Game::Game()
 {
-	this->gameScore = 10;
 	this->loadFromFile();
 
 	this->menuIsOpen = true;
 	this->menu.setRunning(true);
 
-	this->window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "coursework");
-	//window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "coursework", sf::Style::Fullscreen);
+	this->window = new sf::RenderWindow(sf::VideoMode(Setting::screenWidth, Setting::screenHeight), "coursework");
 	this->window->setFramerateLimit(144);
 	this->window->setVerticalSyncEnabled(false);
 
@@ -42,11 +52,13 @@ void Game::update()
 		}
 	}
 
+	this->battleScreen.music->update();
+
 	if (this->menu.isRunning() == true) {
 		this->pumpingScreen.setRunning(false);
 		this->battleScreen.setRunning(false);
 		
-		this->menu.update(this->event);
+		this->menu.update(this->event, this->window);
 		if (this->menu.getCurrentItem() == 0 && this->menu.isRunning() == false) {
 			this->pumpingScreen.setRunning(true);
 		}
@@ -101,6 +113,7 @@ void Game::loadFromFile()
 	int tmpI;
 
 	if (file.is_open() == true) {
+		file >> this->gameScore;
 		while (!file.eof())
 		{
 			tmpCharacters = new characters;
@@ -132,8 +145,8 @@ void Game::saveToFile()
 {
 	ofstream file("data/data.txt");
 	if (file.is_open() == true) {
+		file << this->gameScore << endl;
 		for (int i = 0; i < this->heroes.size(); i++) {
-			cout << i;
 			file << heroes[i].name << " ";
 			file << heroes[i].picturePath << " ";
 			file << heroes[i].get_h() << " ";

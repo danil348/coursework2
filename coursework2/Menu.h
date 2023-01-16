@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "TextureManager.h"
 #include "FontManager.h"
+#include "Setting.h"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ class Menu
 public:
 	Menu();
 	void render(sf::RenderWindow* window);
-	void update(sf::Event event);
+	void update(sf::Event event, sf::RenderWindow* window);
 	bool waitingTime(sf::Event event);
 	bool isRunning() { return this->_isRunning; };
 	void setRunning(bool value) { this->_isRunning = value; };
@@ -19,7 +20,6 @@ public:
 private:
 	bool _isRunning;
 	int currentItem;
-	const int menuItemsCount = 3;
 
 	FontManager fontM;
 	sf::Sprite* background;
@@ -29,4 +29,8 @@ private:
 
 	wstring menuItems[3] = { L"Прокачка",L"битва",L"Настройки" };
 	const int ITEMS_COUNT = 3;
+	const int ITEMS_COUNT_SETTING = 2;
+
+
+	enum { setting_menu, main_menu } menu;
 };

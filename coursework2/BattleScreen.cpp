@@ -5,8 +5,8 @@ BattleScreen::BattleScreen()
 	this->background = TextureManager::load("img/arena.jpg", 1920, 1080);
 	this->soc_background = TextureManager::load("img/PumpingScreen.png", 1920, 1080);
 	this->music = new MusicManager;
-	music->music_load("music/elearning-clock-ticking.wav");
-	music->music_load("music/Minecraft.wav");
+	this->music->music_load("music/elearning-clock-ticking.wav");
+	this->music->music_load("music/Minecraft.wav");
 	this->clock = new sf::Clock;
 	this->_clock = new sf::Clock;
 	this->playerTime = new sf::RectangleShape(sf::Vector2f(100, 30));
@@ -16,13 +16,18 @@ BattleScreen::BattleScreen()
 	this->attackField = new sf::RectangleShape(sf::Vector2f(300, 160));
 
 	this->restart();
+	this->music->play_music(1);
 }
 
-void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
+void BattleScreen::render(vector<characters>& heroes, sf::RenderWindow* window, int& gameScore)
 {
-	window->draw(*(this->soc_connect_step == this->type_selection ||
+	window->draw(*(
+		this->soc_connect_step == this->type_selection ||
 		this->soc_connect_step == this->data_entry ||
-		this->soc_connect_step == this->connection ? this->soc_background : this->background));
+		this->soc_connect_step == this->connection || 
+		this->soc_connect_step == this->end ? 
+		this->soc_background : this->background
+		));
 
 	if (this->soc_connect_step == this->type_selection) {
 		window->draw(*this->fontManager.getText(L" ÎËÂÌÚ", 50,
@@ -75,27 +80,29 @@ void BattleScreen::render(vector<characters> heroes, sf::RenderWindow* window, i
 		flag = true;
 	}
 
-	//=============
-	/*if (this->soc_connect_step == this->game && this->receiving_stage == this->nothing_received) {
-		while (this->soc_tcp->receive(this->enemyHeroes, heroes, this->send) == false) {
-		}
-		this->receiving_stage = this->heroes_received;
-	}*/
-	//=============
-
 	if (this->soc_connect_step == this->game && this->receiving_stage == this->heroes_received) {
 		this->renderStrokeTable(window);
 		this->renderHero(window, heroes);
 		this->renderEvents(window);
 	}
+
+	if (this->soc_connect_step == this->end) {
+		if (this->status == this->victory) {
+			window->draw(*this->fontManager.getText(L"œŒ¡≈ƒ¿", 70, sf::Color::Black , 30, 500));
+			gameScore += 5;
+		}
+		else if(this->status == this->loss) {
+			window->draw(*this->fontManager.getText(L"œŒ–¿∆≈Õ»≈", 70, sf::Color::Black, 30, 500));
+		}
+	}
 }
 
 void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& gameScore)
 {
-	if (this->step == this->game) {
-		//
-		// ===
-		//
+	this->music->update();
+
+	if (this->fightOver(heroes) == false && this->soc_connect_step == this->game) {
+		this->soc_connect_step = this->end;
 	}
 
 	if (this->soc_connect_step == this->connection && this->soc_tcp != NULL) {
@@ -108,19 +115,6 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 		}
 	}
 
-
-
-	//=============
-	/*if (this->soc_connect_step == this->game && this->send == false) {
-		cout << (this->receiving_stage == this->heroes_received);
-		this->soc_tcp->send(this->enemyHeroes, heroes, (this->receiving_stage == this->heroes_received));
-		this->soc_tcp->receive(this->enemyHeroes, heroes, this->send);
-	}*/
-	//=============
-
-	
-	
-	
 	if (this->name == NULL) {
 		this->name = GetForegroundWindow();
 	}
@@ -128,6 +122,9 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 	if (this->waitingTime(event) == true && this->name == GetForegroundWindow()) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
 			this->restart();
+			for (int i = 0; i < heroes.size(); i++) {
+				heroes[i].health = 100;
+			}
 		}
 	}
 
@@ -264,7 +261,6 @@ void BattleScreen::update(sf::Event event, vector<characters>& heroes, int& game
 
 		if (this->_needWalk == true && this->soc_connect_step == this->game) {
 			if (this->_waitingTime(event, this->WalkTime) == true) {
-				cout << "send" << endl;
 				if (this->step == this->hit_made) {
 					if (heroes[this->currentHero].islive == true && this->enemyHeroes[this->currentOpponent].islive == true) {
 						if (rand() % 101 < heroes[this->currentHero].criticalDamage—hance) {
@@ -379,7 +375,7 @@ void BattleScreen::renderHero(sf::RenderWindow* window, vector<characters>& hero
 		window->draw(*this->characteristicsFieldOpponent);
 		this->characteristicsFieldOpponent->setOutlineThickness(0);
 
-		for (int j = 0; j < enemyHeroes[i].characteristicCount; j++) {
+		for (int j = 0; j < 3; j++) {
 			window->draw(*this->fontManager.getText(enemyHeroes[i].getCharacteristicName(j) + ": " + to_string(enemyHeroes[i].getCharacteristic(j))
 				, 16, sf::Color::Black, enemyHeroes[i].get_x() + 20, enemyHeroes[i].get_y() - 50 + 20 * j));
 		}
@@ -437,4 +433,43 @@ void BattleScreen::restart()
 string BattleScreen::getHitString(characters hero) {
 	return (hero.name + " hit " + this->enemyHeroes[this->currentOpponent].name +
 		" (-" + to_string(this->currentDamage) + "hp)");
+}
+
+
+bool BattleScreen::waitingTime(sf::Event event)
+{
+	if (event.type == sf::Event::KeyReleased) {
+		this->time = sf::seconds(2);
+	}
+	this->time = this->clock->getElapsedTime();
+	return (this->time.asMilliseconds() >= 200);
+}
+
+bool BattleScreen::fightOver(vector<characters>& heroes)
+{
+	bool heroesL = false;
+	bool enemyL = false;
+	for (int i = 0; i < heroes.size(); i++) {
+		if (heroes[i].health != 0) {
+			heroesL = true;
+			break;
+		}
+	}
+
+	for (int i = 0; i < enemyHeroes.size(); i++) {
+		if (enemyHeroes[i].health != 0) {
+			enemyL = true;
+		}
+	}
+
+	if ((heroesL && enemyL) == false) {
+		if (heroesL == true) {
+			this->status = this->victory;
+		}
+		else {
+			this->status = this->loss;
+		}
+	}
+
+	return (heroesL && enemyL);
 }

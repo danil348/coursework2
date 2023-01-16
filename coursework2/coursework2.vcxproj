@@ -152,6 +152,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Music.h" />
     <ClInclude Include="PumpingScreen.h" />
+    <ClInclude Include="Setting.h" />
     <ClInclude Include="Tcp_Socket.h" />
     <ClInclude Include="TextureManager.h" />
   </ItemGroup>

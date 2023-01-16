@@ -12,17 +12,25 @@ class BattleScreen : public GameScreen
 {
 public:
 	BattleScreen();
-	void render(vector<characters> heroes, sf::RenderWindow* window, int gameScore) override;
+	void render(vector<characters>& heroes, sf::RenderWindow* window, int& gameScore) override;
 	void update(sf::Event event, vector<characters>& heroes, int& gameScore) override;
 	
 	void renderStrokeTable(sf::RenderWindow* window);
 	void renderHero(sf::RenderWindow* window, vector<characters>& heroes);
 	void heroeshit(vector<characters>& heroes);
 	void renderEvents(sf::RenderWindow* window);
+
+	bool isRunning() { return this->_rinning; };
+	void setRunning(bool value) { this->_rinning = value; };
+
+	bool waitingTime(sf::Event event);
+
+	MusicManager* music;
 private:
 	string getHitString(characters hero);
 	void restart();
 	void keyPressed(string& value, sf::Event event);
+	bool fightOver(vector<characters>& heroes);
 
 	sf::Time _time;
 	sf::Clock* _clock;
@@ -33,15 +41,15 @@ private:
 
 	sf::Sprite* soc_background;
 	enum { server, client, undefined } soc_type;
-	enum { type_selection, data_entry, connection, game } soc_connect_step;
+	enum { type_selection, data_entry, connection, game, end } soc_connect_step;
 	enum { nothing_received, heroes_received, actions_received } receiving_stage;
 	enum { character_selection, choosing_opponent, hit, hit_made} step;
 	enum { step_not_received, step_received} step_knowledge;
+	enum { victory, loss } status;
 	string soc_ip;
 	unsigned short soc_port;
 	string _soc_port;
 	Tcp_Socket* soc_tcp;
-	MusicManager* music;
 
 	HWND name;
 	vector<characters> enemyHeroes;

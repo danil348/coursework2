@@ -7,6 +7,7 @@
 #include "GameScreen.h"
 #include "Menu.h"
 #include <fstream>
+#include "Setting.h"
 #include <vector>
 
 using namespace std;

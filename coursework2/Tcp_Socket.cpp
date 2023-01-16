@@ -86,7 +86,6 @@ bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 	characters* tmpCharacters;
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
 		this->packet >> count;
-		cout << endl << count << endl;
 		for (int i = 0; i < count; i++) {
 			tmpCharacters = new characters;
 			this->packet >> h;
@@ -105,7 +104,6 @@ bool Tcp_Socket::receive(vector<characters>& enemyHeroes, vector<characters>& he
 
 		this->packet >> count;
 		send = count;
-		cout << send;
 	}
 
 	return enemyHeroes.size() != 0;

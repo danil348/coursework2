@@ -14,9 +14,12 @@ PumpingScreen::PumpingScreen()
 	this->_rinning = false;
 }
 
-void PumpingScreen::render(vector<characters> heroes, sf::RenderWindow* window, int gameScore)
+void PumpingScreen::render(vector<characters>& heroes, sf::RenderWindow* window, int& gameScore)
 {
-	
+	for (int i = 0; i < heroes.size(); i++) {
+		heroes[i].set_w_h(1000, 900);
+	}
+
 	window->draw(*this->background);
 	window->draw(*heroes[this->currentHero].getSprite()); 
 	window->draw(*this->fontManager.getText(heroes[currentHero].name, 50,
@@ -120,4 +123,13 @@ void PumpingScreen::update(sf::Event event, vector<characters> &heroes, int& gam
 	else {
 		this->colorValue += 0.5;
 	}
+}
+
+bool PumpingScreen::waitingTime(sf::Event event)
+{
+	if (event.type == sf::Event::KeyReleased) {
+		this->time = sf::seconds(2);
+	}
+	this->time = this->clock->getElapsedTime();
+	return (this->time.asMilliseconds() >= 200);
 }
