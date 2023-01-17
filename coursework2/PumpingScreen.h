@@ -14,11 +14,11 @@ public:
 	PumpingScreen();
 	void render(vector<characters>& heroes, sf::RenderWindow* window, int& gameScore) override;
 	void update(sf::Event event, vector<characters> &heroes, int& gameScore) override;
+	bool waitingTime(sf::Event event) override;
 
 	bool isRunning() { return this->_rinning; };
 	void setRunning(bool value) { this->_rinning = value; };
 
-	bool waitingTime(sf::Event event);
 private:
 	int currentSetting;
 	bool setting;

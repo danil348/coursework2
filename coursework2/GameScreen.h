@@ -8,8 +8,9 @@ using namespace std;
 class GameScreen
 {
 public:
-	virtual void render(vector<characters>& heroes, sf::RenderWindow* window, int& gameScore) {};
-	virtual void update(sf::Event event, vector<characters>& heroes, int& gameScore) {};
+	virtual void render(vector<characters>& heroes, sf::RenderWindow* window, int& gameScore) = 0;
+	virtual void update(sf::Event event, vector<characters>& heroes, int& gameScore) = 0;
+	virtual bool waitingTime(sf::Event event) = 0;
 protected:
 	bool _rinning;
 
