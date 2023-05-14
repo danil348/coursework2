@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Network.hpp>
 #include <iostream>
+#include "Field.h"
 
 #define DEBUG
 
@@ -15,8 +16,8 @@ public:
 	void start();
 	bool accept();
 	bool connect();
-	void send();
-	void receive();
+	Field* receive();
+	void send(Field* data);
 public:
 	unsigned short getPort();
 	string getIp();

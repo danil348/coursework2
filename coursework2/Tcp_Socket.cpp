@@ -57,22 +57,27 @@ string Tcp_Socket::getIp()
 	return this->ip->toString();
 }
 
-void Tcp_Socket::send()
+Field* Tcp_Socket::receive()
+{
+	Field* data = new Field;
+	if (this->socket.receive(this->packet) == sf::Socket::Done) {
+		this->packet >> data->isOccupied;
+		this->packet >> data->isZero;
+		this->packet >> data->x;
+		this->packet >> data->y;
+		return data;
+	}
+	return NULL;
+}
+
+void Tcp_Socket::send(Field* data)
 {
 	this->packet.clear();
 
-	//this->packet << data;
-	// 
-	//this->packet << data;
+	this->packet << data->isOccupied;
+	this->packet << data->isZero;
+	this->packet << data->x;
+	this->packet << data->y;
 
 	this->socket.send(this->packet);
-}
-
-void Tcp_Socket::receive()
-{
-	if (this->socket.receive(this->packet) == sf::Socket::Done) {
-		//this->packet >> data;
-		// 
-		//this->packet >> data;
-	}
 }
