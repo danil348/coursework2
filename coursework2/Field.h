@@ -4,12 +4,21 @@ class Field
 {
 public:
 	Field() {};
-	Field(bool isZero, bool isOccupied) {
-		this->isZero = isZero;
-		this->isOccupied = isOccupied;
+
+	static enum FieldType {
+		EMPTY,
+		SHIP,
+		HIT,
+		MISS,
+		DESTROYED
+	};
+
+	Field(FieldType fieldType, int x, int y) {
+		this->fieldType = fieldType;
+		this->x = x;
+		this->y = y;
 	}
-	bool isZero;
-	bool isOccupied;
+	FieldType fieldType = FieldType::EMPTY;
 	int x = 0;
 	int y = 0;
 };

@@ -59,10 +59,11 @@ string Tcp_Socket::getIp()
 
 Field* Tcp_Socket::receive()
 {
-	Field* data = new Field;
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
-		this->packet >> data->isOccupied;
-		this->packet >> data->isZero;
+		Field* data = new Field;
+		
+		//this->packet >> data->isOccupied;
+		//this->packet >> data->isZero;
 		this->packet >> data->x;
 		this->packet >> data->y;
 		return data;
@@ -74,8 +75,8 @@ void Tcp_Socket::send(Field* data)
 {
 	this->packet.clear();
 
-	this->packet << data->isOccupied;
-	this->packet << data->isZero;
+	//this->packet << data->isOccupied;
+	//this->packet << data->isZero;
 	this->packet << data->x;
 	this->packet << data->y;
 

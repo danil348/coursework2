@@ -7,22 +7,18 @@ Game::Game()
 	this->socketRun();
 #endif // SOCKET
 
-	this->window = new sf::RenderWindow(sf::VideoMode(900, 900), "coursework");
-	this->window->setFramerateLimit(60);
-	this->window->setVerticalSyncEnabled(false);
-
+	this->gameScreen.fill();
 
 	this->gameScreen.setRunning(true);
 }
 
 Game::~Game()
 {
-	delete this->window;
 }
 
 void Game::gameRun()
 {
-	while (this->window->isOpen())
+	while (true)
 	{
 		this->update();
 
@@ -30,8 +26,8 @@ void Game::gameRun()
 		tmp = this->tcp_socket->receive();
 		if (tmp) {
 			this->gameScreen.dataReceive = new Field;
-			this->gameScreen.dataReceive->isOccupied = tmp->isOccupied;
-			this->gameScreen.dataReceive->isZero = tmp->isZero;
+			//this->gameScreen.dataReceive->isOccupied = tmp->isOccupied;
+			//this->gameScreen.dataReceive->isZero = tmp->isZero;
 			this->gameScreen.dataReceive->y = tmp->y;
 			this->gameScreen.dataReceive->x = tmp->x;
 
@@ -47,15 +43,8 @@ void Game::gameRun()
 
 void Game::update()
 {
-	while (this->window->pollEvent(this->event))
-	{
-		if (this->event.type == sf::Event::Closed) {
-			this->window->close();
-		}
-	}
-
 	if (this->gameScreen.isRunning() == true) {
-		this->gameScreen.update(this->window, this->event);
+		this->gameScreen.update();
 
 		if (this->gameScreen.needSend == true) {
 			this->tcp_socket->send(this->gameScreen.dataSend);
@@ -67,13 +56,9 @@ void Game::update()
 
 void Game::render()
 {
-	this->window->clear();
-
 	if (this->gameScreen.isRunning() == true) {
-		this->gameScreen.render(this->window);
+		this->gameScreen.render();
 	}
-
-	this->window->display();
 }
 
 void Game::socketRun()
@@ -89,7 +74,7 @@ void Game::socketRun()
 	} while (type != 'c' && type != 's');
 
 	if (type == 's') {
-		this->gameScreen.playerType = this->gameScreen.cross_type;
+		//this->gameScreen.playerType = this->gameScreen.cross_type;
 		this->gameScreen.needWalk = true;
 
 		this->tcp_socket = new Tcp_Socket;
@@ -97,7 +82,7 @@ void Game::socketRun()
 		cout << "port: " << this->tcp_socket->getPort();
 	}
 	if (type == 'c') {
-		this->gameScreen.playerType = this->gameScreen.zero_type;
+		//this->gameScreen.playerType = this->gameScreen.zero_type;
 		this->gameScreen.needWalk = false;
 
 		string tmpIp;
@@ -110,6 +95,4 @@ void Game::socketRun()
 	}
 
 	this->tcp_socket->start();
-
-
 }

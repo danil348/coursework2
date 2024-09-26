@@ -19,8 +19,6 @@ public:
 	void socketRun();
 
 private:
-	sf::RenderWindow* window;
-	sf::Event event;
 	Tcp_Socket* tcp_socket;
 
 	bool gameScreenIsOpen;
