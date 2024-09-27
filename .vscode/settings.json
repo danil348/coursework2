@@ -3,6 +3,8 @@
     "*.embeddedhtml": "html",
     "*.scss": "postcss",
     "*.module.scss": "postcss",
-    "vector": "cpp"
+    "vector": "cpp",
+    "ostream": "cpp",
+    "string": "cpp"
   }
 }

@@ -7,7 +7,27 @@ Game::Game()
 	this->socketRun();
 #endif // SOCKET
 
+	string tmp;
 	this->gameScreen.fill();
+
+	cout << "waiting for ships data" << endl;
+
+	try
+	{
+		do {
+			this->tcp_socket->sendShipsData(this->gameScreen.ships);
+			tmp = this->tcp_socket->receiveShipsData(this->gameScreen.enemyShips);
+		} while (tmp.empty());
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
+#ifdef DEBUG
+	cout << "ships data received!" << endl;
+	cout << tmp << endl;
+#endif // DEBUG
 
 	this->gameScreen.setRunning(true);
 }
@@ -64,12 +84,12 @@ void Game::render()
 void Game::socketRun()
 {
 	char type;
-	cout << "введите тип подключения: s - server, c - client" << endl;
+	cout << "Choose type: s - server, c - client" << endl;
 	do
 	{
 		cin >> type;
 		if (type != 'c' && type != 's') {
-			cout << "повторите попытку";
+			cout << "Wrong type!" << endl;
 		}
 	} while (type != 'c' && type != 's');
 

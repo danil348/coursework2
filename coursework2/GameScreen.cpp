@@ -7,13 +7,16 @@ GameScreen::GameScreen() {
 void GameScreen::render() {
     if (!this->gameEnd) {
         if (this->needRender) {
-            this->renderField();
+            this->renderField(); // Отображение своего поля
+            this->renderEnemyField(); // Отображение поля противника
             this->needRender = false;
         }
-    } else {
+    }
+    else {
         if (this->zeroWins) {
             // Вывод экрана победы для игрока 1
-        } else {
+        }
+        else {
             // Вывод экрана победы для игрока 2
         }
     }
@@ -31,6 +34,7 @@ void GameScreen::update() {
 }
 
 void GameScreen::renderField() {
+    std::cout << "Your field:" << std::endl;
     for (int i = 0; i < gameSize; i++) {
         for (int j = 0; j < gameSize; j++) {
             bool isShipPresent = false;
@@ -44,7 +48,8 @@ void GameScreen::renderField() {
 
             if (isShipPresent) {
                 std::cout << " O "; // Корабль
-            } else {
+            }
+            else {
                 std::cout << " ~ "; // Пустая клетка
             }
         }
@@ -54,17 +59,18 @@ void GameScreen::renderField() {
 
 void GameScreen::fill() {
     int choice;
-    std::cout << "Выберите метод заполнения: 1 - Автоматически, 2 - Вручную: ";
+    std::cout << "Choose filling method: 1 - Automatically, 2 - Manually: ";
     std::cin >> choice;
     if (choice == 1) {
         this->autoFill(); // Вызов функции автоматического заполнения
-    } else {
+    }
+    else {
         this->manualFill(); // Вызов функции ручного заполнения
     }
 }
 
 void GameScreen::autoFill() {
-    int shipSizes[] = { 1, 1, 1, 1, 2, 2, 2, 3, 3, 4 }; 
+    int shipSizes[] = { 1, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
 
     for (int size : shipSizes) {
         bool placed = false;
@@ -99,7 +105,9 @@ bool GameScreen::canPlaceShip(const Ship& ship) {
         // Проверка на занятые клетки и расстояние
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) continue; // Пропускаем текущую позицию
+                if (dx == 0 && dy == 0) {
+                    continue; // Пропускаем текущую позицию
+                };
                 int checkX = x + dx;
                 int checkY = y + dy;
 
@@ -134,3 +142,26 @@ void GameScreen::restart() {
     this->ships.clear(); // Очистка вектора кораблей при перезапуске
 }
 
+void GameScreen::renderEnemyField() {
+    std::cout << std::endl << "Enemy field:" << std::endl;
+    for (int i = 0; i < gameSize; i++) {
+        for (int j = 0; j < gameSize; j++) {
+            bool isShipPresent = false;
+
+            for (Ship& ship : enemyShips) {
+                if (ship.checkHit(j, i)) {
+                    isShipPresent = true;
+                    break;
+                }
+            }
+
+            if (isShipPresent) {
+                std::cout << " O "; // Корабль противника
+            }
+            else {
+                std::cout << " ~ "; // Пустая клетка
+            }
+        }
+        std::cout << std::endl; // Переход на новую строку
+    }
+}

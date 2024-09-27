@@ -2,6 +2,17 @@
 
 Ship::Ship(int size, bool isHorizontal) : size(size), isSunk(false), isHorizontal(isHorizontal) {}
 
+Ship::Ship(){
+}
+
+void Ship::setSize(int size){
+    this->size = size;
+}
+
+void Ship::setOrientation(bool isHorizontal){
+    this->isHorizontal = isHorizontal;
+}
+
 void Ship::setPosition(int x, int y) {
     for (int i = 0; i < size; ++i) {
         if (isHorizontal) {

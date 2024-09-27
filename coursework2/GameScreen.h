@@ -26,6 +26,7 @@ public:
 	void render() override;
 	void update() override;
 	void renderField();
+	void renderEnemyField();
 	
 	void fill();
 	void autoFill();
@@ -46,9 +47,11 @@ public:
 	bool zeroWins = false;
 	Field* dataSend;
 	Field* dataReceive;
+	
+	vector<Ship> ships;
+	vector<Ship> enemyShips;
 private:
 	void restart();
 
 	vector<vector<Field*>> fieldsItems;
-	vector<Ship> ships;
 };

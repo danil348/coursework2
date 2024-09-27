@@ -1,7 +1,10 @@
 #pragma once
 #include <SFML/Network.hpp>
 #include <iostream>
+#include <vector> // Added for vector<Ship>
 #include "Field.h"
+#include "Ship.h"
+#include <sstream>
 
 #define DEBUG
 
@@ -17,7 +20,10 @@ public:
 	bool accept();
 	bool connect();
 	Field* receive();
+	string receiveShipsData(vector<Ship>& enemyShips);
 	void send(Field* data);
+	void sendShipsData(const vector<Ship>& ships); // Новый метод для отправки данных о кораблях
+	void parseShipsData(const string& data, vector<Ship>& enemyShips); // Новый метод для парсинга данных о кораблях
 public:
 	unsigned short getPort();
 	string getIp();
