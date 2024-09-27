@@ -1,5 +1,6 @@
 #pragma once
 #include "Field.h"
+#include "DataReceive.h"
 #include <vector>
 
 class Ship {
@@ -21,6 +22,7 @@ public:
     
     bool checkHit(int x, int y); // Проверка попадания по кораблю
     bool isSunkStatus(); // Проверка, потоплен ли корабль
+    bool updateSunkStatus(std::vector<DataReceive> steps); // Обновление статуса потопления, возвращает true, если статус изменился
     
     std::vector<Field> getPositions() const { return this->positions; } // Метод для получения позиций корабля
-};
+};  

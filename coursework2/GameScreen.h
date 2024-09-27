@@ -6,6 +6,7 @@
 #include <vector>
 #include "Field.h"
 #include "Ship.h"
+#include "DataReceive.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ public:
 	void update() override;
 	void renderField();
 	void renderEnemyField();
-	
+
 	void fill();
 	void autoFill();
 	void manualFill();
@@ -45,11 +46,14 @@ public:
 	bool needRender = true;
 	bool gameEnd = false;
 	bool zeroWins = false;
-	Field* dataSend;
-	Field* dataReceive;
+	DataReceive* dataSend;
+	DataReceive* dataReceive;
 	
 	vector<Ship> ships;
 	vector<Ship> enemyShips;
+
+	vector<DataReceive> enemySteps;
+	vector<DataReceive> playerSteps;
 private:
 	void restart();
 

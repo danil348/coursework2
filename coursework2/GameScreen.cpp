@@ -7,6 +7,7 @@ GameScreen::GameScreen() {
 void GameScreen::render() {
     if (!this->gameEnd) {
         if (this->needRender) {
+            system("cls");
             this->renderField(); // Отображение своего поля
             this->renderEnemyField(); // Отображение поля противника
             this->needRender = false;
@@ -27,9 +28,73 @@ void GameScreen::update() {
 
     lock_click = true;
 
+    if(this->needWalk){
+        int x, y;
+        bool validShot = false;
+
+        while (!validShot) {
+            cout << "Your turn. " << endl << endl;
+            cout << "Enter x: ";
+            cin >> x;
+            cout << "Enter y: ";
+            cin >> y;
+
+            // Проверка на выстрел в ту же клетку
+            validShot = true;
+            for (const auto& step : this->playerSteps) {
+                if (step.x == x && step.y == y) {
+                    validShot = false;
+                    cout << "You have already shot at this cell. Try again." << endl;
+                    break;
+                }
+            }
+        }
+
+        this->playerSteps.push_back(DataReceive(x, y, true));
+
+        this->needSend = true;
+        this->dataSend = new DataReceive(x, y, true);
+        this->needRender = true;
+    }
+
     if (this->dataReceive) {
-        // Обработка полученных данных
+#ifdef _DEBUG
+        cout << "dataReceive: " << this->dataReceive->x << " " << this->dataReceive->y << endl;
+#endif
+        this->enemySteps.push_back(*this->dataReceive);
         this->dataReceive = NULL;
+        this->needRender = true;
+    }
+
+    // Обновление статуса потопления кораблей
+    for (auto& ship : ships) {
+        if (ship.updateSunkStatus(this->enemySteps)) {
+            // Если статус изменился на потопленный, добавляем выстрелы вокруг корабля
+            for(auto& position : ship.getPositions()) {
+                this->enemySteps.push_back(DataReceive(position.x - 1, position.y, true));
+                this->enemySteps.push_back(DataReceive(position.x + 1, position.y, true));
+                this->enemySteps.push_back(DataReceive(position.x, position.y - 1, true));
+                this->enemySteps.push_back(DataReceive(position.x, position.y + 1, true));
+                this->enemySteps.push_back(DataReceive(position.x - 1, position.y - 1, true));
+                this->enemySteps.push_back(DataReceive(position.x - 1, position.y + 1, true));
+                this->enemySteps.push_back(DataReceive(position.x + 1, position.y - 1, true));
+                this->enemySteps.push_back(DataReceive(position.x + 1, position.y + 1, true));
+            }
+        }
+    }
+    for (auto& ship : enemyShips) {
+        if (ship.updateSunkStatus(this->playerSteps)) {
+            for(auto& position : ship.getPositions()) {
+                this->playerSteps.push_back(DataReceive(position.x - 1, position.y, true));
+                this->playerSteps.push_back(DataReceive(position.x + 1, position.y, true));
+                this->playerSteps.push_back(DataReceive(position.x, position.y - 1, true));
+                this->playerSteps.push_back(DataReceive(position.x, position.y + 1, true));
+                this->playerSteps.push_back(DataReceive(position.x - 1, position.y - 1, true));
+                this->playerSteps.push_back(DataReceive(position.x - 1, position.y + 1, true));
+                this->playerSteps.push_back(DataReceive(position.x + 1, position.y - 1, true));
+                this->playerSteps.push_back(DataReceive(position.x + 1, position.y + 1, true));
+            }
+        }
     }
 }
 
@@ -38,6 +103,7 @@ void GameScreen::renderField() {
     for (int i = 0; i < gameSize; i++) {
         for (int j = 0; j < gameSize; j++) {
             bool isShipPresent = false;
+            bool isHit = false;
 
             for (Ship ship : ships) {
                 if (ship.checkHit(j, i)) {
@@ -46,11 +112,25 @@ void GameScreen::renderField() {
                 }
             }
 
-            if (isShipPresent) {
-                std::cout << " O "; // Корабль
+            for (const auto& step : enemySteps) {
+                if (step.x == j && step.y == i) {
+                    isHit = true;
+                    break;
+                }
             }
-            else {
-                std::cout << " ~ "; // Пустая клетка
+
+            if (isHit) {
+                if (isShipPresent) {
+                    std::cout << " X "; // Попадание по кораблю
+                } else {
+                    std::cout << " * "; // Попадание по пустой клетке
+                }
+            } else {
+                if (isShipPresent) {
+                    std::cout << " O "; // Корабль
+                } else {
+                    std::cout << " ~ "; // Пустая клетка
+                }
             }
         }
         std::cout << std::endl; // Переход на новую строку
@@ -147,18 +227,33 @@ void GameScreen::renderEnemyField() {
     for (int i = 0; i < gameSize; i++) {
         for (int j = 0; j < gameSize; j++) {
             bool isShipPresent = false;
+            bool isHit = false;
+            bool isSunk = false;
 
             for (Ship& ship : enemyShips) {
                 if (ship.checkHit(j, i)) {
                     isShipPresent = true;
+                    if (ship.isSunkStatus()) {
+                        isSunk = true;
+                    }
                     break;
                 }
             }
 
-            if (isShipPresent) {
-                std::cout << " O "; // Корабль противника
+            for (const auto& step : playerSteps) {
+                if (step.x == j && step.y == i) {
+                    isHit = true;
+                    break;
+                }
             }
-            else {
+
+            if (isHit) {
+                if (isShipPresent) {
+                    std::cout << " X "; // Попадание по кораблю
+                } else {
+                    std::cout << " * "; // Попадание по пустой клетке
+                }
+            } else {
                 std::cout << " ~ "; // Пустая клетка
             }
         }

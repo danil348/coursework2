@@ -56,15 +56,20 @@ string Tcp_Socket::getIp()
 	return this->ip->toString();
 }
 
-Field* Tcp_Socket::receive()
+DataReceive* Tcp_Socket::receive()
 {
 	if (this->socket.receive(this->packet) == sf::Socket::Done) {
-		Field* data = new Field;
+		DataReceive* data = new DataReceive;
 
-		//this->packet >> data->isOccupied;
-		//this->packet >> data->isZero;
+
 		this->packet >> data->x;
 		this->packet >> data->y;
+		this->packet >> data->isPlayerStep;
+
+		if(data->x > 12 || data->y > 12){
+			return NULL;
+		}
+
 		return data;
 	}
 	return NULL;
@@ -80,13 +85,13 @@ string Tcp_Socket::receiveShipsData(vector<Ship>& enemyShips) {
 	return "";
 }
 
-void Tcp_Socket::send(Field* data)
+void Tcp_Socket::send(DataReceive* data)
 {
 	this->packet.clear();
 
-	//this->packet << data->isOccupied;
-	//this->packet << data->isZero;
-	this->packet << data->x << data->y;
+	this->packet << data->x;
+	this->packet << data->y;
+	this->packet << data->isPlayerStep;
 
 	this->socket.send(this->packet);
 }

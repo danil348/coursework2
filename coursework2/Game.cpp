@@ -1,4 +1,5 @@
 #include "Game.h"
+
 #define SOCKET
 
 Game::Game()
@@ -42,16 +43,16 @@ void Game::gameRun()
 	{
 		this->update();
 
-		Field* tmp;
+		DataReceive* tmp;
 		tmp = this->tcp_socket->receive();
 		if (tmp) {
-			this->gameScreen.dataReceive = new Field;
-			//this->gameScreen.dataReceive->isOccupied = tmp->isOccupied;
-			//this->gameScreen.dataReceive->isZero = tmp->isZero;
+			this->gameScreen.dataReceive = new DataReceive;
+			
 			this->gameScreen.dataReceive->y = tmp->y;
 			this->gameScreen.dataReceive->x = tmp->x;
-
-			this->gameScreen.needWalk = true;
+			this->gameScreen.dataReceive->isPlayerStep = tmp->isPlayerStep;
+			
+			this->gameScreen.needWalk = !tmp->isPlayerStep;
 		}
 		delete tmp;
 
@@ -69,7 +70,7 @@ void Game::update()
 		if (this->gameScreen.needSend == true) {
 			this->tcp_socket->send(this->gameScreen.dataSend);
 			this->gameScreen.needSend = false;
-			this->gameScreen.needWalk = false;
+			this->gameScreen.needWalk = this->gameScreen.dataSend->isPlayerStep;
 		}
 	}
 }

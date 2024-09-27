@@ -35,3 +35,20 @@ bool Ship::checkHit(int x, int y) {
 bool Ship::isSunkStatus() {
     return isSunk; // Возвращает статус потопления
 }
+
+bool Ship::updateSunkStatus(std::vector<DataReceive> steps) {
+    int hitCount = 0;
+    for (const auto& position : positions) {
+        for (const auto& step : steps) {
+            if (position.x == step.x && position.y == step.y) {
+                hitCount++;
+                break;
+            }
+        }
+    }
+    if (hitCount == size) {
+        isSunk = true;
+        return true; // Статус изменился на потопленный
+    }
+    return false; // Статус не изменился
+}
