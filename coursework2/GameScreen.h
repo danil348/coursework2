@@ -59,6 +59,9 @@ public:
 	vector<DataReceive> playerSteps;
 private:
 	void restart();
+	void addSurroundingShots(vector<DataReceive>& steps, const Ship& ship);
+	bool isValidShot(int x, int y, const vector<DataReceive>& steps);
+	void handleShot(int x, int y, vector<Ship>& ships, vector<DataReceive>& steps, bool& isHit);
 
 	vector<vector<Field*>> fieldsItems;
 };
