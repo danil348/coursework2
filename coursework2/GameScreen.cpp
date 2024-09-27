@@ -13,50 +13,9 @@ void GameScreen::render() {
             this->needRender = false;
         }
     }
-    else {
-        if (this->zeroWins) {
-            // Вывод экрана победы для игрока 1
-        }
-        else {
-            // Вывод экрана победы для игрока 2
-        }
-    }
 }
 
-void GameScreen::update() {
-    static bool lock_click;
-
-    lock_click = true;
-
-    if(this->needWalk){
-        int x, y;
-        bool validShot = false;
-
-        while (!validShot) {
-            cout << "Your turn. " << endl << endl;
-            cout << "Enter x: ";
-            cin >> x;
-            cout << "Enter y: ";
-            cin >> y;
-
-            // Проверка на выстрел в ту же клетку
-            validShot = true;
-            for (const auto& step : this->playerSteps) {
-                if (step.x == x && step.y == y) {
-                    validShot = false;
-                    cout << "You have already shot at this cell. Try again." << endl;
-                    break;
-                }
-            }
-        }
-
-        this->playerSteps.push_back(DataReceive(x, y, true));
-
-        this->needSend = true;
-        this->dataSend = new DataReceive(x, y, true);
-        this->needRender = true;
-    }
-
+void GameScreen::receiveData() {
     if (this->dataReceive) {
 #ifdef _DEBUG
         cout << "dataReceive: " << this->dataReceive->x << " " << this->dataReceive->y << endl;
@@ -66,6 +25,10 @@ void GameScreen::update() {
         this->needRender = true;
     }
 
+    this->shipUpdate();
+}
+
+void GameScreen::shipUpdate() {
     // Обновление статуса потопления кораблей
     for (auto& ship : ships) {
         if (ship.updateSunkStatus(this->enemySteps)) {
@@ -96,6 +59,57 @@ void GameScreen::update() {
             }
         }
     }
+}
+
+void GameScreen::update() {
+    static bool lock_click;
+
+    lock_click = true;
+
+    if(this->needWalk && this->gameEnd == false){
+        int x, y;
+        bool validShot = false;
+
+        while (!validShot) {
+            cout << "Your turn. " << endl << endl;
+            cout << "Enter x: ";
+            cin >> x;
+            cout << "Enter y: ";
+            cin >> y;
+
+            // Проверка на корректность координат
+            if (x < 0 || x >= gameSize || y < 0 || y >= gameSize) {
+                cout << "Coordinates are out of bounds. Try again." << endl;
+                continue;
+            }
+
+            // Проверка на выстрел в ту же клетку
+            validShot = true;
+            for (const auto& step : this->playerSteps) {
+                if (step.x == x && step.y == y) {
+                    validShot = false;
+                    cout << "You have already shot at this cell. Try again." << endl;
+                    break;
+                }
+            }
+        }
+
+        bool isHit = false;
+        for (auto& ship : enemyShips) {
+            if (ship.checkHit(x, y)) {
+                isHit = true;
+                break;
+            }
+        }
+
+        this->playerSteps.push_back(DataReceive(x, y, true));
+
+        this->needSend = true;
+        this->dataSend = new DataReceive(x, y, isHit);
+        this->needRender = true;
+    }
+
+    this->shipUpdate();
 }
 
 void GameScreen::renderField() {
@@ -150,7 +164,8 @@ void GameScreen::fill() {
 }
 
 void GameScreen::autoFill() {
-    int shipSizes[] = { 1, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
+    int shipSizes[] = { 1, 1 };
+    // int shipSizes[] = { 1, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
 
     for (int size : shipSizes) {
         bool placed = false;
@@ -213,7 +228,35 @@ void GameScreen::manualFill() {
 }
 
 void GameScreen::winsUpdate() {
-    // Логика обновления состояния победы
+    bool allPlayerShipsSunk = true;
+    bool allEnemyShipsSunk = true;
+
+    // Проверка всех кораблей игрока
+    for (auto& ship : ships) {
+        if (!ship.isSunkStatus()) {
+            allPlayerShipsSunk = false;
+            break;
+        }
+    }
+
+    // Проверка всех кораблей противника
+    for (auto& ship : enemyShips) {
+        if (!ship.isSunkStatus()) {
+            allEnemyShipsSunk = false;
+            break;
+        }
+    }
+
+    if ((allPlayerShipsSunk || allEnemyShipsSunk) && this->gameEnd == false) {
+        system("cls");
+        gameEnd = true;
+        this->needRender = false;
+        if (allEnemyShipsSunk) {
+            cout << "You win. Congratulations!" << endl;
+        } else {
+            cout << "You lose. Try again!" << endl;
+        }
+    }
 }
 
 void GameScreen::restart() {

@@ -41,6 +41,9 @@ void Game::gameRun()
 {
 	while (true)
 	{
+		this->gameScreen.receiveData();
+		
+		this->render();
 		this->update();
 
 		DataReceive* tmp;

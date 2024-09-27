@@ -26,6 +26,8 @@ public:
 	GameScreen();
 	void render() override;
 	void update() override;
+	void receiveData();
+
 	void renderField();
 	void renderEnemyField();
 
@@ -35,11 +37,12 @@ public:
 	bool canPlaceShip(const Ship& ship);
 
 	void winsUpdate();
+	void shipUpdate();
 
 	bool isRunning() { return this->_rinning; };
 	void setRunning(bool value) { this->_rinning = value; };
 
-	int gameSize = 12;
+	int gameSize = 10;
 
 	bool needSend = false;
 	bool needWalk = false;
